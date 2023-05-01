@@ -1,0 +1,9 @@
+# CMake build
+**/Build/
+
+# Editor configurations
+**/.vscode/
+**/.idea/
+
+# Various other files
+.clangd
