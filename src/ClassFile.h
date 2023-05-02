@@ -9,6 +9,7 @@
 #include "ConstantInfo.h"
 #include "ConstantPool.h"
 #include <AK/Format.h>
+#include <AK/StringBuilder.h>
 #include <AK/Vector.h>
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1-200-B.2
@@ -112,19 +113,30 @@ struct ClassFile {
 namespace AK {
 
 template<>
-struct Formatter<ClassFile> : Formatter<FormatString> {
-    ErrorOr<void> format(FormatBuilder& builder, ClassFile const& class_file)
+struct Formatter<ClassFile> : Formatter<StringView> {
+    ErrorOr<void> format(FormatBuilder& format_builder, ClassFile const& class_file)
     {
-        return Formatter<FormatString>::format(builder,
-            "Classfile {{ magic=0x{:02X}, minor_version={}, major_version={}, constant_pool_count={}, access_flags={}, this_class={}, super_class={}, fields={} }}"sv,
-            class_file.magic,
-            class_file.minor_version,
-            class_file.major_version,
-            class_file.constant_pool_count,
-            class_file.access_flags,
-            class_file.this_class,
-            class_file.super_class,
-            class_file.fields);
+        StringBuilder builder;
+        builder.append("ClassFile {\n"sv);
+
+        builder.appendff("  magic=0x{:02X}\n", class_file.magic);
+        builder.appendff("  major_version={}\n", class_file.major_version);
+        builder.appendff("  minor_version={}\n", class_file.minor_version);
+        builder.appendff("  constant_pool_count={}\n", class_file.constant_pool_count);
+        builder.appendff("  access_flags={}\n", class_file.access_flags);
+        builder.appendff("  this_class={}\n", class_file.this_class);
+        builder.appendff("  super_class={}\n", class_file.super_class);
+        // builder.appendff("  interfaces={}\n", class_file.interfaces);
+
+        // The default foratting for Vector<T> annoyed me!
+        builder.appendff("  fields=[\n", class_file.fields);
+        for (auto& field : class_file.fields) {
+            builder.appendff("    {}\n", field);
+        }
+        builder.appendff("  ]\n", class_file.fields);
+
+        builder.append('}');
+        return Formatter<StringView>::format(format_builder, builder.string_view());
     }
 };
 
