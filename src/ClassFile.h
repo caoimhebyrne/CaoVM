@@ -13,7 +13,6 @@
 #include <AK/Vector.h>
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1-200-B.2
-// FIXME: Use this
 enum MajorVersion : u16 {
     V1_1 = 45,
     V1_2 = 46,
@@ -53,23 +52,6 @@ struct FieldInfo {
     //  A field can have any number of optional attributes associated with it.
     Vector<AttributeInfo> attributes;
 };
-
-// Used for debug formatting
-namespace AK {
-
-template<>
-struct Formatter<FieldInfo> : Formatter<FormatString> {
-    ErrorOr<void> format(FormatBuilder& builder, FieldInfo const& field_info)
-    {
-        return Formatter<FormatString>::format(builder,
-            "FieldInfo {{ access_flags={}, name_index={}, descriptor_index={} }}"sv,
-            field_info.access_flags,
-            field_info.name_index,
-            field_info.descriptor_index);
-    }
-};
-
-}
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html
 struct ClassFile {
@@ -137,6 +119,18 @@ struct Formatter<ClassFile> : Formatter<StringView> {
 
         builder.append('}');
         return Formatter<StringView>::format(format_builder, builder.string_view());
+    }
+};
+
+template<>
+struct Formatter<FieldInfo> : Formatter<FormatString> {
+    ErrorOr<void> format(FormatBuilder& builder, FieldInfo const& field_info)
+    {
+        return Formatter<FormatString>::format(builder,
+            "FieldInfo {{ access_flags={}, name_index={}, descriptor_index={} }}"sv,
+            field_info.access_flags,
+            field_info.name_index,
+            field_info.descriptor_index);
     }
 };
 
