@@ -25,8 +25,8 @@ public:
 
 private:
     ErrorOr<ConstantClassInfo> parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool);
-    ErrorOr<FieldInfo> parse_field();
-    ErrorOr<AttributeInfo> parse_attribute();
+    ErrorOr<FieldInfo> parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool);
+    ErrorOr<AttributeInfo> parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool);
 
     NonnullOwnPtr<BigEndianInputBitStream> m_stream;
 };

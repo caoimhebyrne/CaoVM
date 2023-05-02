@@ -67,7 +67,7 @@ ErrorOr<ClassFile> ClassParser::parse()
     // The field_info structures represent all fields, both class and instance variables defined by this class/interface.
     auto fields = Vector<FieldInfo>();
     for (auto i = 0; i < fields_length; i++) {
-        auto field_info = TRY(this->parse_field());
+        auto field_info = TRY(this->parse_field(constant_pool));
         fields.append(field_info);
     }
 
@@ -101,7 +101,7 @@ ErrorOr<ConstantClassInfo> ClassParser::parse_interface(NonnullOwnPtr<ConstantPo
     return static_cast<ConstantClassInfo&>(*constant);
 }
 
-ErrorOr<FieldInfo> ClassParser::parse_field()
+ErrorOr<FieldInfo> ClassParser::parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     // Used to denote access permission to this field
     auto access_flags = TRY(this->read_u2());
@@ -116,7 +116,7 @@ ErrorOr<FieldInfo> ClassParser::parse_field()
     auto attributes_count = TRY(this->read_u2());
     auto attributes = Vector<AttributeInfo>();
     for (auto i = 0; i < attributes_count; i++) {
-        auto attribute = TRY(this->parse_attribute());
+        auto attribute = TRY(this->parse_attribute(constant_pool));
         attributes.append(attribute);
     }
 
@@ -128,7 +128,7 @@ ErrorOr<FieldInfo> ClassParser::parse_field()
     };
 }
 
-ErrorOr<AttributeInfo> ClassParser::parse_attribute()
+ErrorOr<AttributeInfo> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     // An index in the constant pool table to name of this attribute
     auto name_index = TRY(this->read_u2());
@@ -136,8 +136,22 @@ ErrorOr<AttributeInfo> ClassParser::parse_attribute()
     // The length of the data for this attribute, immediately after the end of this u4
     auto attribute_length = TRY(this->read_u4());
 
-    // FIXME: Implement attribute parsing
-    TRY(m_stream->discard(attribute_length));
+    // The constant_pool entry at attribute_name_index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the name of the attribute.
+    auto const& constant = constant_pool->entries().at(name_index - 1);
+    VERIFY(constant->tag() == ConstantPool::Tag::UTF8);
+
+    auto attribute_name = static_cast<ConstantUTF8Info&>(*constant).data();
+    if (attribute_name == "ConstantValue") {
+        // The value of the attribute_length item must be two.
+        VERIFY(attribute_length == 2);
+
+        // The constant_pool entry at that index gives the value represented by this attribute.
+        auto constantvalue_index = TRY(this->read_u2());
+        dbgln("constantvalue_index = {}", constantvalue_index);
+
+        auto const& constant_value = constant_pool->entries().at(constantvalue_index - 1);
+        dbgln("constant_value = {}", TRY(constant_value->debug_description()));
+    }
 
     return AttributeInfo {
         .name_index = name_index,
