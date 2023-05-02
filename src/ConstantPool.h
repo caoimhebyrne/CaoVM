@@ -51,47 +51,6 @@ private:
     Vector<NonnullOwnPtr<ConstantInfo>> m_entries;
 };
 
-namespace AK {
-
-template<>
-struct Formatter<ConstantPool::Tag> : Formatter<StringView> {
-    ErrorOr<void> format(FormatBuilder& builder, ConstantPool::Tag const& tag)
-    {
-        switch (tag) {
-        case ConstantPool::Tag::UTF8: {
-            return Formatter<StringView>::format(builder, "UTF8"sv);
-        }
-
-        case ConstantPool::Tag::Class: {
-            return Formatter<StringView>::format(builder, "Class"sv);
-        }
-
-        case ConstantPool::Tag::String: {
-            return Formatter<StringView>::format(builder, "String"sv);
-        }
-
-        case ConstantPool::Tag::FieldReference: {
-            return Formatter<StringView>::format(builder, "FieldReference"sv);
-        }
-
-        case ConstantPool::Tag::MethodReference: {
-            return Formatter<StringView>::format(builder, "MethodReference"sv);
-        }
-
-        case ConstantPool::Tag::NameAndType: {
-            return Formatter<StringView>::format(builder, "NameAndType"sv);
-        }
-
-        default: {
-            TODO();
-            break;
-        }
-        }
-    }
-};
-
-}
-
 // Every constant in the constant_pool_table has information associated with it
 class ConstantInfo {
 public:
