@@ -9,6 +9,24 @@
 #include "ConstantPool.h"
 #include <AK/String.h>
 
+class ConstantInfo {
+public:
+    virtual ~ConstantInfo() = default;
+
+    ConstantPool::Tag const& tag() { return m_tag; };
+
+    virtual ErrorOr<String> debug_description() = 0;
+
+protected:
+    ConstantInfo(ConstantPool::Tag tag)
+        : m_tag(tag)
+    {
+    }
+
+private:
+    ConstantPool::Tag m_tag;
+};
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.7
 class ConstantUTF8Info : public ConstantInfo {
 public:

@@ -53,22 +53,3 @@ public:
 private:
     Vector<NonnullOwnPtr<ConstantInfo>> m_entries;
 };
-
-// Every constant in the constant_pool_table has information associated with it
-class ConstantInfo {
-public:
-    virtual ~ConstantInfo() = default;
-
-    ConstantPool::Tag const& tag() { return m_tag; };
-
-    virtual ErrorOr<String> debug_description() = 0;
-
-protected:
-    ConstantInfo(ConstantPool::Tag tag)
-        : m_tag(tag)
-    {
-    }
-
-private:
-    ConstantPool::Tag m_tag;
-};
