@@ -7,7 +7,7 @@
 # Fetch serenity, so that we can build Lagom from it
 FetchContent_Declare(lagom
     GIT_REPOSITORY https://github.com/SerenityOS/serenity.git
-    GIT_TAG f6ff373 # May 2 2023 @ 5:50pm GMT+1
+    GIT_TAG origin/master # May 2 2023 @ 5:50pm GMT+1
     GIT_SHALLOW TRUE
     SOURCE_DIR serenity
 )
