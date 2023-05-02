@@ -4,8 +4,13 @@
  * SPDX-License-Identifier: MIT
  */
 
+#pragma once
+
 #include <AK/Forward.h>
 #include <AK/Types.h>
+
+// Forward-declaration
+class ConstantInfo;
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 class ConstantPool {
@@ -31,5 +36,22 @@ public:
         NameAndType = 12,
     };
 
-    static ErrorOr<void> parse_constant_pool(u16 size, NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<Vector<NonnullOwnPtr<ConstantInfo>>> parse_constant_pool(u16 size, NonnullOwnPtr<BigEndianInputBitStream>& stream);
+};
+
+// Every constant in the constant_pool_table has information associated with it
+class ConstantInfo {
+public:
+    static ErrorOr<NonnullOwnPtr<ConstantInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+
+    ConstantPool::Tag const& tag() { return m_tag; };
+
+protected:
+    ConstantInfo(ConstantPool::Tag tag)
+        : m_tag(tag)
+    {
+    }
+
+private:
+    ConstantPool::Tag m_tag;
 };
