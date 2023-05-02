@@ -30,6 +30,16 @@ ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> ConstantUTF8Info::parse(NonnullOwnPtr<B
     return try_make<ConstantUTF8Info>(string);
 }
 
+ErrorOr<String> ConstantUTF8Info::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("[UTF8] "sv);
+    builder.append(data());
+
+    return builder.to_string();
+}
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.1
 ConstantClassInfo::ConstantClassInfo(u16 name_index)
     : ConstantInfo(ConstantPool::Tag::Class)
@@ -44,11 +54,38 @@ ErrorOr<NonnullOwnPtr<ConstantClassInfo>> ConstantClassInfo::parse(NonnullOwnPtr
     return try_make<ConstantClassInfo>(name_index);
 }
 
+ErrorOr<String> ConstantClassInfo::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("[Class] "sv);
+    builder.appendff("name_index = {}", name_index());
+
+    return builder.to_string();
+}
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.3
 ConstantStringInfo::ConstantStringInfo(u16 string_index)
     : ConstantInfo(ConstantPool::Tag::String)
     , m_index(string_index)
 {
+}
+
+ErrorOr<NonnullOwnPtr<ConstantStringInfo>> ConstantStringInfo::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+{
+    // u2 string_index;
+    auto string_index = TRY(stream->read_bits<u16>(16));
+    return try_make<ConstantStringInfo>(string_index);
+}
+
+ErrorOr<String> ConstantStringInfo::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("[String] "sv);
+    builder.appendff("index = {}", index());
+
+    return builder.to_string();
 }
 
 // // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2
@@ -70,11 +107,14 @@ ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo:
     return try_make<ConstantMemberReferenceInfo>(tag, class_index, name_and_type_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantStringInfo>> ConstantStringInfo::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<String> ConstantMemberReferenceInfo::debug_description()
 {
-    // u2 string_index;
-    auto string_index = TRY(stream->read_bits<u16>(16));
-    return try_make<ConstantStringInfo>(string_index);
+    StringBuilder builder;
+
+    builder.append("[Member Reference] "sv);
+    builder.appendff("class_index = {}, name_and_type_index = {}", class_index(), name_and_type_index());
+
+    return builder.to_string();
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4
@@ -89,6 +129,16 @@ ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> ConstantIntegerInfo::parse(NonnullOw
     // u4 bytes;
     auto value = TRY(stream->read_bits<u32>(32));
     return try_make<ConstantIntegerInfo>(value);
+}
+
+ErrorOr<String> ConstantIntegerInfo::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("[Integer] "sv);
+    builder.appendff("{}", value());
+
+    return builder.to_string();
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.6
@@ -108,4 +158,14 @@ ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> ConstantNameAndTypeInfo::parse(N
     auto descriptor_index = TRY(stream->read_bits<u16>(16));
 
     return try_make<ConstantNameAndTypeInfo>(name_index, descriptor_index);
+}
+
+ErrorOr<String> ConstantNameAndTypeInfo::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("[Name and Type] "sv);
+    builder.appendff("name_index = {}, descriptor_index = {}", name_index(), descriptor_index());
+
+    return builder.to_string();
 }

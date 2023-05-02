@@ -16,6 +16,8 @@ public:
 
     static ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
 
+    ErrorOr<String> debug_description();
+
     String const& data() { return m_data; };
 
 private:
@@ -28,6 +30,8 @@ public:
     ConstantClassInfo(u16 name_index);
 
     static ErrorOr<NonnullOwnPtr<ConstantClassInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+
+    ErrorOr<String> debug_description();
 
     u16 name_index() { return m_name_index; };
 
@@ -42,6 +46,8 @@ public:
     ConstantMemberReferenceInfo(ConstantPool::Tag tag, u16 name_index, u16 descriptor_index);
 
     static ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> parse(ConstantPool::Tag tag, NonnullOwnPtr<BigEndianInputBitStream>& stream);
+
+    ErrorOr<String> debug_description();
 
     u16 class_index() { return m_class_index; };
     u16 name_and_type_index() { return m_name_and_type_index; };
@@ -67,6 +73,8 @@ public:
 
     static ErrorOr<NonnullOwnPtr<ConstantStringInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
 
+    ErrorOr<String> debug_description();
+
     u16 index() { return m_index; };
 
 private:
@@ -80,6 +88,8 @@ public:
 
     static ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
 
+    ErrorOr<String> debug_description();
+
     u32 value() { return m_value; };
 
 private:
@@ -92,6 +102,8 @@ public:
     ConstantNameAndTypeInfo(u16 name_index, u16 descriptor_index);
 
     static ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+
+    ErrorOr<String> debug_description();
 
     u16 name_index() { return m_name_index; };
     u16 descriptor_index() { return m_descriptor_index; };

@@ -104,52 +104,7 @@ ErrorOr<int> serenity_main(Main::Arguments)
     dbgln("{}", parsed);
 
     for (auto const& entry : parsed.constant_pool->entries()) {
-        switch (entry->tag()) {
-        case ConstantPool::Tag::UTF8: {
-            auto info = static_cast<ConstantUTF8Info&>(*entry);
-            dbgln("[UTF8 Entry]: {}", info.data());
-            break;
-        }
-
-        case ConstantPool::Tag::Class: {
-            auto info = static_cast<ConstantClassInfo&>(*entry);
-            dbgln("[Class Entry]: name_index = {}", info.name_index());
-            break;
-        }
-
-        case ConstantPool::Tag::FieldReference: {
-            auto info = static_cast<ConstantFieldReferenceInfo&>(*entry);
-            dbgln("[FieldReference Entry]: name_and_type_index = {}", info.name_and_type_index());
-            break;
-        }
-
-        case ConstantPool::Tag::MethodReference: {
-            auto info = static_cast<ConstantMethodReferenceInfo&>(*entry);
-            dbgln("[MethodReference Entry]: name_and_type_index = {}", info.name_and_type_index());
-            break;
-        }
-
-        case ConstantPool::Tag::NameAndType: {
-            auto info = static_cast<ConstantNameAndTypeInfo&>(*entry);
-            dbgln("[NameAndType Entry]: name_index = {}, descriptor_index = {}", info.name_index(), info.descriptor_index());
-            break;
-        }
-
-        case ConstantPool::Tag::String: {
-            auto info = static_cast<ConstantStringInfo&>(*entry);
-            dbgln("[String Entry]: index = {}", info.index());
-            break;
-        }
-
-        case ConstantPool::Tag::Integer: {
-            auto info = static_cast<ConstantIntegerInfo&>(*entry);
-            dbgln("[Integer Entry]: {}", info.value());
-            break;
-        }
-
-        default:
-            TODO();
-        }
+        dbgln("{}", TRY(entry->debug_description()));
     }
 
     return 0;
