@@ -36,6 +36,19 @@ ErrorOr<ClassFile> parse_class_file(NonnullOwnPtr<BigEndianInputBitStream> strea
     auto this_class = TRY(stream->read_bits<u16>(16));
     auto super_class = TRY(stream->read_bits<u16>(16));
 
+    auto interfaces_count = TRY(stream->read_bits<u16>(16));
+    auto interfaces = Vector<ConstantClassInfo>();
+    for (auto i = 0; i < interfaces_count; i++) {
+        auto index = TRY(stream->read_bits<u16>(16));
+        auto const& constant = constant_pool->entries().at(index);
+
+        // The constant_pool entry at each value of interfaces[i], where 0 ≤ i < interfaces_count, must be a CONSTANT_Class_info structure
+        VERIFY(constant->tag() == ConstantPool::Tag::Class);
+
+        auto value = static_cast<ConstantClassInfo&>(*constant);
+        interfaces.append(value);
+    }
+
     // Construct a class file struct
     ClassFile file {
         .magic = magic,
@@ -46,6 +59,7 @@ ErrorOr<ClassFile> parse_class_file(NonnullOwnPtr<BigEndianInputBitStream> strea
         .access_flags = access_flags,
         .this_class = this_class,
         .super_class = super_class,
+        .interfaces = interfaces,
     };
 
     return file;

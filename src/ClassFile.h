@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: MIT
  */
 
+#pragma once
+
+#include "ConstantInfo.h"
 #include "ConstantPool.h"
 #include <AK/Format.h>
 #include <AK/Vector.h>
@@ -54,6 +57,12 @@ struct ClassFile {
     // Must be 0, or a valid index into the constant pool table. If it's nonzero, the value at that index be a CONSTANT_Class_info structure.
     // If 0, then this class file must represent the class Object, the only class or interface without a direct superclass.
     u16 super_class;
+
+    // Each value in the interfaces array must be a valid index into the constant_pool table.
+    //
+    // The constant_pool entry at each value of interfaces[i], where 0 ≤ i < interfaces_count, must be a CONSTANT_Class_info structure
+    // representing an interface that is a direct superinterface of this class or interface type, in the left-to-right order given in the source for the type.
+    Vector<ConstantClassInfo> interfaces;
 };
 
 // Used for debug formatting
