@@ -7,7 +7,9 @@
 #pragma once
 
 #include <AK/Forward.h>
+#include <AK/NonnullOwnPtr.h>
 #include <AK/Types.h>
+#include <AK/Vector.h>
 
 // Forward-declaration
 class ConstantInfo;
@@ -36,14 +38,63 @@ public:
         NameAndType = 12,
     };
 
-    static ErrorOr<Vector<NonnullOwnPtr<ConstantInfo>>> parse_constant_pool(u16 size, NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    ConstantPool(Vector<NonnullOwnPtr<ConstantInfo>> entries)
+        : m_entries(move(entries))
+    {
+    }
+
+    static ErrorOr<NonnullOwnPtr<ConstantPool>> parse(u16 size, NonnullOwnPtr<BigEndianInputBitStream>& stream);
+
+    Vector<NonnullOwnPtr<ConstantInfo>> const& entries() { return m_entries; };
+
+private:
+    Vector<NonnullOwnPtr<ConstantInfo>> m_entries;
 };
+
+namespace AK {
+
+template<>
+struct Formatter<ConstantPool::Tag> : Formatter<StringView> {
+    ErrorOr<void> format(FormatBuilder& builder, ConstantPool::Tag const& tag)
+    {
+        switch (tag) {
+        case ConstantPool::Tag::UTF8: {
+            return Formatter<StringView>::format(builder, "UTF8"sv);
+        }
+
+        case ConstantPool::Tag::Class: {
+            return Formatter<StringView>::format(builder, "Class"sv);
+        }
+
+        case ConstantPool::Tag::String: {
+            return Formatter<StringView>::format(builder, "String"sv);
+        }
+
+        case ConstantPool::Tag::FieldReference: {
+            return Formatter<StringView>::format(builder, "FieldReference"sv);
+        }
+
+        case ConstantPool::Tag::MethodReference: {
+            return Formatter<StringView>::format(builder, "MethodReference"sv);
+        }
+
+        case ConstantPool::Tag::NameAndType: {
+            return Formatter<StringView>::format(builder, "NameAndType"sv);
+        }
+
+        default: {
+            TODO();
+            break;
+        }
+        }
+    }
+};
+
+}
 
 // Every constant in the constant_pool_table has information associated with it
 class ConstantInfo {
 public:
-    static ErrorOr<NonnullOwnPtr<ConstantInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
-
     ConstantPool::Tag const& tag() { return m_tag; };
 
 protected:

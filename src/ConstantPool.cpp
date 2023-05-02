@@ -9,9 +9,9 @@
 #include <AK/BitStream.h>
 #include <AK/String.h>
 
-ErrorOr<Vector<NonnullOwnPtr<ConstantInfo>>> ConstantPool::parse_constant_pool(u16 size, NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, NonnullOwnPtr<BigEndianInputBitStream>& stream)
 {
-    auto table = Vector<NonnullOwnPtr<ConstantInfo>>();
+    auto entries = Vector<NonnullOwnPtr<ConstantInfo>>();
 
     for (int i = 0; i < size; i++) {
         // The constant_pool table is indexed from 1 to constant_pool_count - 1.
@@ -20,32 +20,32 @@ ErrorOr<Vector<NonnullOwnPtr<ConstantInfo>>> ConstantPool::parse_constant_pool(u
 
         switch (tag) {
         case ConstantPool::Tag::FieldReference: {
-            table.append(TRY(ConstantMemberReferenceInfo::parse(ConstantPool::Tag::FieldReference, stream)));
+            entries.append(TRY(ConstantMemberReferenceInfo::parse(ConstantPool::Tag::FieldReference, stream)));
             break;
         }
 
         case ConstantPool::Tag::MethodReference: {
-            table.append(TRY(ConstantMemberReferenceInfo::parse(ConstantPool::Tag::MethodReference, stream)));
+            entries.append(TRY(ConstantMemberReferenceInfo::parse(ConstantPool::Tag::MethodReference, stream)));
             break;
         }
 
         case ConstantPool::Tag::Class: {
-            table.append(TRY(ConstantClassInfo::parse(stream)));
+            entries.append(TRY(ConstantClassInfo::parse(stream)));
             break;
         }
 
         case ConstantPool::Tag::NameAndType: {
-            table.append(TRY(ConstantNameAndTypeInfo::parse(stream)));
+            entries.append(TRY(ConstantNameAndTypeInfo::parse(stream)));
             break;
         }
 
         case ConstantPool::Tag::UTF8: {
-            table.append(TRY(ConstantUTF8Info::parse(stream)));
+            entries.append(TRY(ConstantUTF8Info::parse(stream)));
             break;
         }
 
         case ConstantPool::Tag::String: {
-            table.append(TRY(ConstantStringInfo::parse(stream)));
+            entries.append(TRY(ConstantStringInfo::parse(stream)));
             break;
         }
 
@@ -56,5 +56,5 @@ ErrorOr<Vector<NonnullOwnPtr<ConstantInfo>>> ConstantPool::parse_constant_pool(u
         }
     }
 
-    return table;
+    return make<ConstantPool>(move(entries));
 }
