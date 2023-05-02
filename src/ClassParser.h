@@ -24,5 +24,9 @@ public:
     ErrorOr<u32> read_u4();
 
 private:
+    ErrorOr<ConstantClassInfo> parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool);
+    ErrorOr<FieldInfo> parse_field();
+    ErrorOr<AttributeInfo> parse_attribute();
+
     NonnullOwnPtr<BigEndianInputBitStream> m_stream;
 };
