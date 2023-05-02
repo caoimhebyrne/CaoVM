@@ -49,6 +49,34 @@ ErrorOr<ClassFile> parse_class_file(NonnullOwnPtr<BigEndianInputBitStream> strea
         interfaces.append(value);
     }
 
+    // FIXME: Clean this up
+    auto fields_count = TRY(stream->read_bits<u16>(16));
+    auto fields = Vector<FieldInfo>();
+    for (auto i = 0; i < fields_count; i++) {
+        auto access_flags = TRY(stream->read_bits<u16>(16));
+        auto name_index = TRY(stream->read_bits<u16>(16));
+        auto descriptor_index = TRY(stream->read_bits<u16>(16));
+
+        auto attributes_count = TRY(stream->read_bits<u16>(16));
+        auto attributes = Vector<AttributeInfo>();
+        for (auto i = 0; i < attributes_count; i++) {
+            auto name_index = TRY(stream->read_bits<u16>(16));
+            auto attribute_length = TRY(stream->read_bits<u32>(32));
+
+            // FIXME: Implement attribute parsing
+            TRY(stream->discard(attribute_length));
+
+            attributes.append({ .name_index = name_index });
+        }
+
+        fields.append({
+            .access_flags = access_flags,
+            .name_index = name_index,
+            .descriptor_index = descriptor_index,
+            .attributes = attributes,
+        });
+    }
+
     // Construct a class file struct
     ClassFile file {
         .magic = magic,
@@ -60,6 +88,7 @@ ErrorOr<ClassFile> parse_class_file(NonnullOwnPtr<BigEndianInputBitStream> strea
         .this_class = this_class,
         .super_class = super_class,
         .interfaces = interfaces,
+        .fields = fields,
     };
 
     return file;

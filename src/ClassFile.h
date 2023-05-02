@@ -33,6 +33,43 @@ enum MajorVersion : u16 {
     V17 = 61
 };
 
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7
+struct AttributeInfo {
+    u16 name_index;
+};
+
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.5
+struct FieldInfo {
+    // The value of the access_flags item is a mask of flags used to denote access permission to and properties of this field.
+    u16 access_flags;
+
+    // The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) which represents a valid unqualified name denoting a field (§4.2.2).
+    u16 name_index;
+
+    // The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) which represents a valid field descriptor (§4.3.2).
+    u16 descriptor_index;
+
+    //  A field can have any number of optional attributes associated with it.
+    Vector<AttributeInfo> attributes;
+};
+
+// Used for debug formatting
+namespace AK {
+
+template<>
+struct Formatter<FieldInfo> : Formatter<FormatString> {
+    ErrorOr<void> format(FormatBuilder& builder, FieldInfo const& field_info)
+    {
+        return Formatter<FormatString>::format(builder,
+            "FieldInfo {{ access_flags={}, name_index={}, descriptor_index={} }}"sv,
+            field_info.access_flags,
+            field_info.name_index,
+            field_info.descriptor_index);
+    }
+};
+
+}
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html
 struct ClassFile {
     // The magic item supplies the magic number identifying the class file format; it has the value 0xCAFEBABE.
@@ -63,6 +100,12 @@ struct ClassFile {
     // The constant_pool entry at each value of interfaces[i], where 0 ≤ i < interfaces_count, must be a CONSTANT_Class_info structure
     // representing an interface that is a direct superinterface of this class or interface type, in the left-to-right order given in the source for the type.
     Vector<ConstantClassInfo> interfaces;
+
+    // Each value in the fields table must be a field_info structure (§4.5) giving a complete description of a field in this class or interface.
+    //
+    // The fields table includes only those fields that are declared by this class or interface.
+    // It does not include items representing fields that are inherited from superclasses or superinterfaces.
+    Vector<FieldInfo> fields;
 };
 
 // Used for debug formatting
@@ -73,14 +116,15 @@ struct Formatter<ClassFile> : Formatter<FormatString> {
     ErrorOr<void> format(FormatBuilder& builder, ClassFile const& class_file)
     {
         return Formatter<FormatString>::format(builder,
-            "Classfile {{ magic=0x{:02X}, minor_version={}, major_version={}, constant_pool_count={}, access_flags={}, this_class={}, super_class={} }}"sv,
+            "Classfile {{ magic=0x{:02X}, minor_version={}, major_version={}, constant_pool_count={}, access_flags={}, this_class={}, super_class={}, fields={} }}"sv,
             class_file.magic,
             class_file.minor_version,
             class_file.major_version,
             class_file.constant_pool_count,
             class_file.access_flags,
             class_file.this_class,
-            class_file.super_class);
+            class_file.super_class,
+            class_file.fields);
     }
 };
 
