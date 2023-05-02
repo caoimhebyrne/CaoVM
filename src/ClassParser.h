@@ -18,6 +18,11 @@ public:
 
     ErrorOr<ClassFile> parse();
 
+    // The JVM spec defines a few data types for unsigned integers, werid naming but sure...
+    ErrorOr<u8> read_u1();
+    ErrorOr<u16> read_u2();
+    ErrorOr<u32> read_u4();
+
 private:
     NonnullOwnPtr<BigEndianInputBitStream> m_stream;
 };
