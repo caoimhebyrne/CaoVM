@@ -49,6 +49,11 @@ ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, NonnullOwnPtr
             break;
         }
 
+        case ConstantPool::Tag::Integer: {
+            entries.append(TRY(ConstantIntegerInfo::parse(stream)));
+            break;
+        }
+
         default: {
             dbgln("Unimplemented tag @ {}: {}", pool_index, tag);
             TODO();

@@ -73,6 +73,19 @@ private:
     u16 m_index;
 };
 
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4
+class ConstantIntegerInfo : public ConstantInfo {
+public:
+    ConstantIntegerInfo(u32 value);
+
+    static ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+
+    u32 value() { return m_value; };
+
+private:
+    u32 m_value;
+};
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.6
 class ConstantNameAndTypeInfo : public ConstantInfo {
 public:

@@ -22,6 +22,9 @@ public:
         // Raw UTF8 data
         UTF8 = 1,
 
+        // Used to represent constant primitives of the type int
+        Integer = 3,
+
         // Used to represent a class or an interface
         Class = 7,
 

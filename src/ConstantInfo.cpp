@@ -77,6 +77,20 @@ ErrorOr<NonnullOwnPtr<ConstantStringInfo>> ConstantStringInfo::parse(NonnullOwnP
     return try_make<ConstantStringInfo>(string_index);
 }
 
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4
+ConstantIntegerInfo::ConstantIntegerInfo(u32 value)
+    : ConstantInfo(ConstantPool::Tag::Integer)
+    , m_value(value)
+{
+}
+
+ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> ConstantIntegerInfo::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+{
+    // u4 bytes;
+    auto value = TRY(stream->read_bits<u32>(32));
+    return try_make<ConstantIntegerInfo>(value);
+}
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.6
 ConstantNameAndTypeInfo::ConstantNameAndTypeInfo(u16 name_index, u16 descriptor_index)
     : ConstantInfo(ConstantPool::Tag::NameAndType)

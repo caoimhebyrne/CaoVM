@@ -112,6 +112,12 @@ ErrorOr<int> serenity_main(Main::Arguments)
             break;
         }
 
+        case ConstantPool::Tag::Integer: {
+            auto info = static_cast<ConstantIntegerInfo&>(*entry);
+            dbgln("[Integer Entry]: {}", info.value());
+            break;
+        }
+
         default:
             TODO();
         }
