@@ -6,9 +6,13 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Use Serenity's recommended defaults
-add_compile_options(-Wno-literal-suffix) # AK::StringView defines operator"" sv, which GCC complains does not have an underscore.
-add_compile_options(-fno-gnu-keywords)   # JS::Value has a method named typeof, which also happens to be a GNU keyword.
+add_compile_options(-fno-gnu-keywords)              # JS::Value has a method named typeof, which also happens to be a GNU keyword.
+add_compile_options(-Wno-unknown-warning-option)    # We don't really care about if an option doesn't exist
+
+# Both GCC and clang complain about the same issue, but use different warning names.
+# AK::StringView defines operator"" sv, they complain because it does not have an underscore.
+add_compile_options(-Wno-user-defined-literals)
+add_compile_options(-Wno-literal-suffix)
 
 # Use Lagom from SerenityOS
 include(FetchContent)
