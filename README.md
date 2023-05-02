@@ -23,7 +23,7 @@ Well, someone started that before, but as the [creator Andreas said](https://git
 
 `.vscode/settings.json`
 
-```json
+```jsonc
 {
   // Excluding the generated directories keeps your file view clean and speeds up search.
   "files.exclude": {
