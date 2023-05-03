@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "Attribute.h"
 #include "ConstantInfo.h"
 #include "ConstantPool.h"
 #include <AK/Format.h>
@@ -33,11 +34,6 @@ enum MajorVersion : u16 {
     V17 = 61
 };
 
-// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7
-struct AttributeInfo {
-    u16 name_index;
-};
-
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.5
 struct FieldInfo {
     // The value of the access_flags item is a mask of flags used to denote access permission to and properties of this field.
@@ -49,8 +45,8 @@ struct FieldInfo {
     // The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) which represents a valid field descriptor (§4.3.2).
     u16 descriptor_index;
 
-    //  A field can have any number of optional attributes associated with it.
-    Vector<AttributeInfo> attributes;
+    // A field can have any number of optional attributes associated with it.
+    Vector<NonnullOwnPtr<AttributeInfo>> attributes;
 };
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html
@@ -88,7 +84,7 @@ struct ClassFile {
     //
     // The fields table includes only those fields that are declared by this class or interface.
     // It does not include items representing fields that are inherited from superclasses or superinterfaces.
-    Vector<FieldInfo> fields;
+    Vector<NonnullOwnPtr<FieldInfo>> fields;
 };
 
 // Used for debug formatting
@@ -111,27 +107,42 @@ struct Formatter<ClassFile> : Formatter<StringView> {
         // builder.appendff("  interfaces={}\n", class_file.interfaces);
 
         // The default foratting for Vector<T> annoyed me!
-        builder.appendff("  fields=[\n", class_file.fields);
-        for (auto& field : class_file.fields) {
-            builder.appendff("    {}\n", field);
+        builder.appendff("  fields=[\n");
+        for (auto const& field : class_file.fields) {
+            builder.append("    FieldInfo {\n"sv);
+
+            builder.appendff("      access_flags={}\n", field->access_flags);
+            builder.appendff("      name_index={}\n", field->name_index);
+            builder.appendff("      descriptor_index={}\n", field->descriptor_index);
+
+            builder.appendff("      attributes=[\n");
+            for (auto const& attribute : field->attributes) {
+                builder.appendff("        {}\n", TRY(attribute->debug_description()));
+            }
+            builder.append("      ]\n"sv);
+
+            builder.append("    }\n"sv);
         }
-        builder.appendff("  ]\n", class_file.fields);
+        builder.append("  ]\n"sv);
 
         builder.append('}');
         return Formatter<StringView>::format(format_builder, builder.string_view());
     }
 };
 
-template<>
-struct Formatter<FieldInfo> : Formatter<FormatString> {
-    ErrorOr<void> format(FormatBuilder& builder, FieldInfo const& field_info)
-    {
-        return Formatter<FormatString>::format(builder,
-            "FieldInfo {{ access_flags={}, name_index={}, descriptor_index={} }}"sv,
-            field_info.access_flags,
-            field_info.name_index,
-            field_info.descriptor_index);
-    }
-};
+// TODO: Fix me
+// template<>
+// struct Formatter<FieldInfo> : Formatter<FormatString> {
+//     ErrorOr<void> format(FormatBuilder& builder, FieldInfo const& field_info)
+//     {
+//         return Formatter<FormatString>::format(builder,
+
+//             "FieldInfo {{ access_flags={}, name_index={}, descriptor_index={}, attributes={} }}"sv,
+//             field_info.access_flags,
+//             field_info.name_index,
+//             field_info.descriptor_index,
+//             field_info.attributes);
+//     }
+// };
 
 }

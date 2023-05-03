@@ -65,10 +65,9 @@ ErrorOr<ClassFile> ClassParser::parse()
     auto fields_length = TRY(this->read_u2());
 
     // The field_info structures represent all fields, both class and instance variables defined by this class/interface.
-    auto fields = Vector<FieldInfo>();
+    auto fields = Vector<NonnullOwnPtr<FieldInfo>>();
     for (auto i = 0; i < fields_length; i++) {
-        auto field_info = TRY(this->parse_field(constant_pool));
-        fields.append(field_info);
+        fields.append(TRY(this->parse_field(constant_pool)));
     }
 
     // Construct a class file struct
@@ -82,7 +81,7 @@ ErrorOr<ClassFile> ClassParser::parse()
         .this_class = this_class,
         .super_class = super_class,
         .interfaces = interfaces,
-        .fields = fields,
+        .fields = move(fields),
     };
 
     return file;
@@ -101,7 +100,7 @@ ErrorOr<ConstantClassInfo> ClassParser::parse_interface(NonnullOwnPtr<ConstantPo
     return static_cast<ConstantClassInfo&>(*constant);
 }
 
-ErrorOr<FieldInfo> ClassParser::parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     // Used to denote access permission to this field
     auto access_flags = TRY(this->read_u2());
@@ -114,48 +113,35 @@ ErrorOr<FieldInfo> ClassParser::parse_field(NonnullOwnPtr<ConstantPool> const& c
 
     // The amount of attributes belonging to this field
     auto attributes_count = TRY(this->read_u2());
-    auto attributes = Vector<AttributeInfo>();
+    auto attributes = Vector<NonnullOwnPtr<AttributeInfo>>();
     for (auto i = 0; i < attributes_count; i++) {
-        auto attribute = TRY(this->parse_attribute(constant_pool));
-        attributes.append(attribute);
+        attributes.append(TRY(this->parse_attribute(constant_pool)));
     }
 
-    return FieldInfo {
-        .access_flags = access_flags,
-        .name_index = name_index,
-        .descriptor_index = descriptor_index,
-        .attributes = attributes,
-    };
+    return try_make<FieldInfo>(access_flags, name_index, descriptor_index, move(attributes));
 }
 
-ErrorOr<AttributeInfo> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullOwnPtr<AttributeInfo>> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     // An index in the constant pool table to name of this attribute
     auto name_index = TRY(this->read_u2());
 
     // The length of the data for this attribute, immediately after the end of this u4
     auto attribute_length = TRY(this->read_u4());
+    (void)attribute_length; // Maybe we should validate that we've read the correct amount?
 
     // The constant_pool entry at attribute_name_index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the name of the attribute.
     auto const& constant = constant_pool->entries().at(name_index - 1);
     VERIFY(constant->tag() == ConstantPool::Tag::UTF8);
 
+    // The attribute name helps us to understand the data that we should read next
     auto attribute_name = static_cast<ConstantUTF8Info&>(*constant).data();
     if (attribute_name == "ConstantValue") {
-        // The value of the attribute_length item must be two.
-        VERIFY(attribute_length == 2);
-
-        // The constant_pool entry at that index gives the value represented by this attribute.
-        auto constantvalue_index = TRY(this->read_u2());
-        dbgln("constantvalue_index = {}", constantvalue_index);
-
-        auto const& constant_value = constant_pool->entries().at(constantvalue_index - 1);
-        dbgln("constant_value = {}", TRY(constant_value->debug_description()));
+        return ConstantValueAttributeInfo::parse(*this);
+    } else {
+        dbgln("Unimplemented attribute: {}", attribute_name);
+        TODO();
     }
-
-    return AttributeInfo {
-        .name_index = name_index,
-    };
 }
 
 ErrorOr<u8> ClassParser::read_u1()
