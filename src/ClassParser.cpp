@@ -67,7 +67,8 @@ ErrorOr<ClassFile> ClassParser::parse()
     // The field_info structures represent all fields, both class and instance variables defined by this class/interface.
     auto fields = Vector<NonnullOwnPtr<FieldInfo>>();
     for (auto i = 0; i < fields_length; i++) {
-        fields.append(TRY(this->parse_field(constant_pool)));
+        auto field = TRY(this->parse_field(constant_pool));
+        fields.append(move(field));
     }
 
     // Construct a class file struct
@@ -115,7 +116,8 @@ ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<Constan
     auto attributes_count = TRY(this->read_u2());
     auto attributes = Vector<NonnullOwnPtr<AttributeInfo>>();
     for (auto i = 0; i < attributes_count; i++) {
-        attributes.append(TRY(this->parse_attribute(constant_pool)));
+        auto attribute = TRY(this->parse_attribute(constant_pool));
+        attributes.append(move(attribute));
     }
 
     return try_make<FieldInfo>(access_flags, name_index, descriptor_index, move(attributes));
