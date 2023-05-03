@@ -9,6 +9,9 @@
 #include "ConstantPool.h"
 #include <AK/String.h>
 
+// Forward declaration
+class ClassParser;
+
 class ConstantInfo {
 public:
     virtual ~ConstantInfo() = default;
@@ -32,7 +35,7 @@ class ConstantUTF8Info : public ConstantInfo {
 public:
     ConstantUTF8Info(String data);
 
-    static ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 
@@ -47,7 +50,7 @@ class ConstantClassInfo : public ConstantInfo {
 public:
     ConstantClassInfo(u16 name_index);
 
-    static ErrorOr<NonnullOwnPtr<ConstantClassInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<NonnullOwnPtr<ConstantClassInfo>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 
@@ -63,7 +66,7 @@ class ConstantMemberReferenceInfo : public ConstantInfo {
 public:
     ConstantMemberReferenceInfo(ConstantPool::Tag tag, u16 name_index, u16 descriptor_index);
 
-    static ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> parse(ConstantPool::Tag tag, NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> parse(ConstantPool::Tag tag, ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 
@@ -89,7 +92,7 @@ class ConstantStringInfo : public ConstantInfo {
 public:
     ConstantStringInfo(u16 string_index);
 
-    static ErrorOr<NonnullOwnPtr<ConstantStringInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<NonnullOwnPtr<ConstantStringInfo>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 
@@ -104,7 +107,7 @@ class ConstantIntegerInfo : public ConstantInfo {
 public:
     ConstantIntegerInfo(u32 value);
 
-    static ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 
@@ -119,7 +122,7 @@ class ConstantNameAndTypeInfo : public ConstantInfo {
 public:
     ConstantNameAndTypeInfo(u16 name_index, u16 descriptor_index);
 
-    static ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> parse(NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 

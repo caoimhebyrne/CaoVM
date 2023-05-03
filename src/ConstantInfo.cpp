@@ -5,6 +5,7 @@
  */
 
 #include "ConstantInfo.h"
+#include "ClassParser.h"
 #include <AK/BitStream.h>
 #include <AK/NonnullOwnPtr.h>
 
@@ -52,60 +53,60 @@ ConstantNameAndTypeInfo::ConstantNameAndTypeInfo(u16 name_index, u16 descriptor_
 {
 }
 
-ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> ConstantUTF8Info::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> ConstantUTF8Info::parse(ClassParser& class_parser)
 {
     // The value of the length item gives the number of bytes in the bytes array (not the length of the resulting string).
-    auto length = TRY(stream->read_bits<u16>(16));
+    auto length = TRY(class_parser.read_u2());
 
     // The bytes array contains the bytes of the string.
     // FIXME: String content is encoded in modified UTF-8.
     auto buffer = TRY(ByteBuffer::create_uninitialized(length));
-    TRY(stream->read_until_filled(buffer));
+    TRY(class_parser.stream()->read_until_filled(buffer));
 
     // Convert the bytest to a UTF-8 String
     auto string = TRY(String::from_utf8(buffer));
     return try_make<ConstantUTF8Info>(string);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantClassInfo>> ConstantClassInfo::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<NonnullOwnPtr<ConstantClassInfo>> ConstantClassInfo::parse(ClassParser& class_parser)
 {
     // u2 name_index;
-    auto name_index = TRY(stream->read_bits<u16>(16));
+    auto name_index = TRY(class_parser.read_u2());
     return try_make<ConstantClassInfo>(name_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo::parse(ConstantPool::Tag tag, NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo::parse(ConstantPool::Tag tag, ClassParser& class_parser)
 {
     // u2 class_index;
-    auto class_index = TRY(stream->read_bits<u16>(16));
+    auto class_index = TRY(class_parser.read_u2());
 
     // u2 name_and_type_index;
-    auto name_and_type_index = TRY(stream->read_bits<u16>(16));
+    auto name_and_type_index = TRY(class_parser.read_u2());
 
     return try_make<ConstantMemberReferenceInfo>(tag, class_index, name_and_type_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantStringInfo>> ConstantStringInfo::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<NonnullOwnPtr<ConstantStringInfo>> ConstantStringInfo::parse(ClassParser& class_parser)
 {
     // u2 string_index;
-    auto string_index = TRY(stream->read_bits<u16>(16));
+    auto string_index = TRY(class_parser.read_u2());
     return try_make<ConstantStringInfo>(string_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> ConstantIntegerInfo::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> ConstantIntegerInfo::parse(ClassParser& class_parser)
 {
     // u4 bytes;
-    auto value = TRY(stream->read_bits<u32>(32));
+    auto value = TRY(class_parser.read_u4());
     return try_make<ConstantIntegerInfo>(value);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> ConstantNameAndTypeInfo::parse(NonnullOwnPtr<BigEndianInputBitStream>& stream)
+ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> ConstantNameAndTypeInfo::parse(ClassParser& class_parser)
 {
     // u2 name_index;
-    auto name_index = TRY(stream->read_bits<u16>(16));
+    auto name_index = TRY(class_parser.read_u2());
 
     // u2 descriptor_index;
-    auto descriptor_index = TRY(stream->read_bits<u16>(16));
+    auto descriptor_index = TRY(class_parser.read_u2());
 
     return try_make<ConstantNameAndTypeInfo>(name_index, descriptor_index);
 }

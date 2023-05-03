@@ -13,6 +13,7 @@
 
 // Forward-declaration
 class ConstantInfo;
+class ClassParser;
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 class ConstantPool {
@@ -46,7 +47,7 @@ public:
     {
     }
 
-    static ErrorOr<NonnullOwnPtr<ConstantPool>> parse(u16 size, NonnullOwnPtr<BigEndianInputBitStream>& stream);
+    static ErrorOr<NonnullOwnPtr<ConstantPool>> parse(u16 size, ClassParser& class_parser);
 
     Vector<NonnullOwnPtr<ConstantInfo>> const& entries() { return m_entries; };
 

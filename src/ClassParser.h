@@ -23,6 +23,8 @@ public:
     ErrorOr<u16> read_u2();
     ErrorOr<u32> read_u4();
 
+    NonnullOwnPtr<BigEndianInputBitStream> const& stream() { return m_stream; };
+
 private:
     ErrorOr<ConstantClassInfo> parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool);
     ErrorOr<NonnullOwnPtr<FieldInfo>> parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool);

@@ -40,7 +40,7 @@ ErrorOr<ClassFile> ClassParser::parse()
 
     // The constant pool is a table of structures representing various constants!
     auto constant_pool_count = TRY(this->read_u2());
-    auto constant_pool = TRY(ConstantPool::parse(constant_pool_count - 1, m_stream));
+    auto constant_pool = TRY(ConstantPool::parse(constant_pool_count - 1, *this));
 
     // Used to denote access permissions to this class/interface and its properties
     auto access_flags = TRY(this->read_u2());
