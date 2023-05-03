@@ -106,6 +106,9 @@ struct ClassFile {
     // The method_info structures represent all methods declared by this class or interface type.
     // The methods table does not include items representing methods that are inherited from superclasses or superinterfaces.
     Vector<NonnullOwnPtr<MethodInfo>> methods;
+
+    // A class can have any number of optional attributes associated with it.
+    Vector<NonnullOwnPtr<Attribute>> attributes;
 };
 
 // Used for debug formatting
@@ -172,6 +175,12 @@ struct Formatter<ClassFile> : Formatter<StringView> {
             builder.append("      ]\n"sv);
 
             builder.append("    }\n"sv);
+        }
+        builder.append("  ]\n"sv);
+
+        builder.appendff("  attributes=[\n");
+        for (auto const& attribute : class_file.attributes) {
+            builder.appendff("    {}\n", TRY(attribute->debug_description()));
         }
         builder.append("  ]\n"sv);
 

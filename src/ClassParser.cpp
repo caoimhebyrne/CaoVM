@@ -81,6 +81,16 @@ ErrorOr<ClassFile> ClassParser::parse()
         methods.append(move(method));
     }
 
+    // The number of attribute_info structures in the attributes table.
+    auto attributes_length = TRY(this->read_u2());
+
+    // A class can have any number of optional attributes associated with it.
+    auto attributes = Vector<NonnullOwnPtr<Attribute>>();
+    for (auto i = 0; i < attributes_length; i++) {
+        auto attribute = TRY(this->parse_attribute(constant_pool));
+        attributes.append(move(attribute));
+    }
+
     // Construct a class file struct
     ClassFile file {
         .magic = magic,
@@ -94,6 +104,7 @@ ErrorOr<ClassFile> ClassParser::parse()
         .interfaces = interfaces,
         .fields = move(fields),
         .methods = move(methods),
+        .attributes = move(attributes),
     };
 
     return file;
