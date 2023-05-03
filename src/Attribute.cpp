@@ -89,3 +89,63 @@ ErrorOr<String> CodeAttribute::debug_description()
 
     return builder.to_string();
 }
+
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.12
+LineNumberTableAttribute::LineNumberTableAttribute(Vector<LineNumberTableAttribute::Entry> table)
+    : Attribute(AttributeType::LineNumberTable)
+    , m_table(move(table))
+{
+}
+
+ErrorOr<NonnullOwnPtr<LineNumberTableAttribute>> LineNumberTableAttribute::parse(ClassParser& class_parser)
+{
+    auto line_number_table_length = TRY(class_parser.read_u2());
+    auto table = Vector<LineNumberTableAttribute::Entry>();
+
+    for (auto i = 0; i < line_number_table_length; i++) {
+        auto entry = TRY(LineNumberTableAttribute::parse_entry(class_parser));
+        table.append(entry);
+    }
+
+    return make<LineNumberTableAttribute>(table);
+}
+
+ErrorOr<LineNumberTableAttribute::Entry> LineNumberTableAttribute::parse_entry(ClassParser& class_parser)
+{
+    // The start_pc indicates the index into the code array at which the code for a new line in the original source file begins.
+    auto start_pc = TRY(class_parser.read_u2());
+
+    // The value of the line_number item gives the corresponding line number in the original source file.
+    auto line_number = TRY(class_parser.read_u2());
+
+    return Entry {
+        .start_pc = start_pc,
+        .line_number = line_number
+    };
+}
+
+ErrorOr<String> LineNumberTableAttribute::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("LineNumberTableAttribute { "sv);
+
+    size_t index = 0;
+    for (auto const& entry : table()) {
+        index++;
+
+        builder.append("{ "sv);
+        builder.appendff("pc = {}, ln = {}", entry.start_pc, entry.line_number);
+        builder.append(" }"sv);
+
+        if (table().size() != index) {
+            builder.append(',');
+        }
+
+        builder.append(" "sv);
+    }
+
+    builder.append("}"sv);
+
+    return builder.to_string();
+}

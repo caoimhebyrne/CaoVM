@@ -18,6 +18,10 @@ enum class AttributeType {
 
     // A Code attribute contains the Java Virtual Machine instructions and auxiliary information for a method
     Code,
+
+    // The LineNumberTable attribute is an optional variable-length attribute in the attributes table of a Code attribute.
+    // It may be used by debuggers to determine which part of the code array corresponds to a given line number in the original source file.
+    LineNumberTable,
 };
 
 class Attribute {
@@ -82,4 +86,29 @@ private:
     u16 m_max_locals;
     ByteBuffer m_code;
     Vector<NonnullOwnPtr<Attribute>> m_attributes;
+};
+
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.12
+class LineNumberTableAttribute : public Attribute {
+public:
+    struct Entry {
+        // The item indicates the index into the code array at which the code for a new line in the original source file begins.
+        u16 start_pc;
+
+        // The value of the line_number item gives the corresponding line number in the original source file.
+        u16 line_number;
+    };
+
+    LineNumberTableAttribute(Vector<Entry> table);
+
+    static ErrorOr<NonnullOwnPtr<LineNumberTableAttribute>> parse(ClassParser& class_parser);
+
+    ErrorOr<String> debug_description();
+
+    Vector<Entry> const& table() { return m_table; };
+
+private:
+    Vector<Entry> m_table;
+
+    static ErrorOr<Entry> parse_entry(ClassParser& class_parser);
 };

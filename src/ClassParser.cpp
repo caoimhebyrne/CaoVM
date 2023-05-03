@@ -175,6 +175,8 @@ ErrorOr<NonnullOwnPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<Con
         return ConstantValueAttribute::parse(*this);
     } else if (attribute_name == "Code") {
         return CodeAttribute::parse(*this, constant_pool);
+    } else if (attribute_name == "LineNumberTable") {
+        return LineNumberTableAttribute::parse(*this);
     } else {
         dbgln("Unimplemented attribute: {}", attribute_name);
         TODO();
