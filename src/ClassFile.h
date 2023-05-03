@@ -157,6 +157,24 @@ struct Formatter<ClassFile> : Formatter<StringView> {
         }
         builder.append("  ]\n"sv);
 
+        builder.appendff("  methods=[\n");
+        for (auto const& method : class_file.methods) {
+            builder.append("    MethodInfo {\n"sv);
+
+            builder.appendff("      access_flags={}\n", method->access_flags);
+            builder.appendff("      name_index={}\n", method->name_index);
+            builder.appendff("      descriptor_index={}\n", method->descriptor_index);
+
+            builder.appendff("      attributes=[\n");
+            for (auto const& attribute : method->attributes) {
+                builder.appendff("        {}\n", TRY(attribute->debug_description()));
+            }
+            builder.append("      ]\n"sv);
+
+            builder.append("    }\n"sv);
+        }
+        builder.append("  ]\n"sv);
+
         builder.append('}');
         return Formatter<StringView>::format(format_builder, builder.string_view());
     }

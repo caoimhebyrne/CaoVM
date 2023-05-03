@@ -173,6 +173,8 @@ ErrorOr<NonnullOwnPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<Con
     auto attribute_name = static_cast<ConstantUTF8Info&>(*constant).data();
     if (attribute_name == "ConstantValue") {
         return ConstantValueAttribute::parse(*this);
+    } else if (attribute_name == "Code") {
+        return CodeAttribute::parse(*this, constant_pool);
     } else {
         dbgln("Unimplemented attribute: {}", attribute_name);
         TODO();

@@ -10,10 +10,14 @@
 
 // Forward-declaration
 class ClassParser;
+class ConstantPool;
 
 enum class AttributeType {
     // A ConstantValue attribute represents the value of a constant expression
-    ConstantValue
+    ConstantValue,
+
+    // A Code attribute contains the Java Virtual Machine instructions and auxiliary information for a method
+    Code,
 };
 
 class Attribute {
@@ -57,4 +61,25 @@ public:
 
 private:
     u16 m_value_index;
+};
+
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.3
+class CodeAttribute : public Attribute {
+public:
+    CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vector<NonnullOwnPtr<Attribute>> attributes);
+
+    static ErrorOr<NonnullOwnPtr<CodeAttribute>> parse(ClassParser& class_parser, NonnullOwnPtr<ConstantPool> const& constant_pool);
+
+    ErrorOr<String> debug_description();
+
+    u16 max_stack() { return m_max_stack; };
+    u16 max_locals() { return m_max_locals; };
+    ByteBuffer const& code() { return m_code; };
+    Vector<NonnullOwnPtr<Attribute>> const& attributes() { return m_attributes; };
+
+private:
+    u16 m_max_stack;
+    u16 m_max_locals;
+    ByteBuffer m_code;
+    Vector<NonnullOwnPtr<Attribute>> m_attributes;
 };
