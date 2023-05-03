@@ -114,8 +114,9 @@ ErrorOr<String> ConstantUTF8Info::debug_description()
 {
     StringBuilder builder;
 
-    builder.append("[UTF8] "sv);
-    builder.append(data());
+    builder.append("UTF8 { "sv);
+    builder.appendff("\"{}\"", data());
+    builder.append(" }"sv);
 
     return builder.to_string();
 }
@@ -124,8 +125,9 @@ ErrorOr<String> ConstantClassInfo::debug_description()
 {
     StringBuilder builder;
 
-    builder.append("[Class] "sv);
+    builder.append("Class { "sv);
     builder.appendff("name_index = {}", name_index());
+    builder.append(" }"sv);
 
     return builder.to_string();
 }
@@ -134,8 +136,10 @@ ErrorOr<String> ConstantMemberReferenceInfo::debug_description()
 {
     StringBuilder builder;
 
-    builder.append("[Member Reference] "sv);
-    builder.appendff("class_index = {}, name_and_type_index = {}", class_index(), name_and_type_index());
+    builder.append("MemberReference { "sv);
+    builder.appendff("class_index = {}, ", class_index());
+    builder.appendff("name_and_type_index = {}", name_and_type_index());
+    builder.append(" }"sv);
 
     return builder.to_string();
 }
@@ -144,8 +148,9 @@ ErrorOr<String> ConstantStringInfo::debug_description()
 {
     StringBuilder builder;
 
-    builder.append("[String] "sv);
+    builder.append("String { "sv);
     builder.appendff("index = {}", index());
+    builder.append(" }"sv);
 
     return builder.to_string();
 }
@@ -154,8 +159,9 @@ ErrorOr<String> ConstantIntegerInfo::debug_description()
 {
     StringBuilder builder;
 
-    builder.append("[Integer] "sv);
+    builder.append("Integer { "sv);
     builder.appendff("{}", value());
+    builder.append(" }"sv);
 
     return builder.to_string();
 }
@@ -164,8 +170,10 @@ ErrorOr<String> ConstantNameAndTypeInfo::debug_description()
 {
     StringBuilder builder;
 
-    builder.append("[Name and Type] "sv);
-    builder.appendff("name_index = {}, descriptor_index = {}", name_index(), descriptor_index());
+    builder.append("NameAndType { "sv);
+    builder.appendff("name_index = {}, ", name_index());
+    builder.appendff("descriptor_index = {}", descriptor_index());
+    builder.append(" }"sv);
 
     return builder.to_string();
 }

@@ -101,6 +101,17 @@ struct Formatter<ClassFile> : Formatter<StringView> {
         builder.appendff("  major_version={}\n", class_file.major_version);
         builder.appendff("  minor_version={}\n", class_file.minor_version);
         builder.appendff("  constant_pool_count={}\n", class_file.constant_pool_count);
+
+        builder.appendff("  constant_pool=[\n");
+
+        auto constant_index = 1;
+        for (auto const& constant : class_file.constant_pool->entries()) {
+            builder.appendff("    {}: {}\n", constant_index, TRY(constant->debug_description()));
+            constant_index++;
+        }
+
+        builder.append("  ]\n"sv);
+
         builder.appendff("  access_flags={}\n", class_file.access_flags);
         builder.appendff("  this_class={}\n", class_file.this_class);
         builder.appendff("  super_class={}\n", class_file.super_class);
