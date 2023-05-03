@@ -149,3 +149,28 @@ ErrorOr<String> LineNumberTableAttribute::debug_description()
 
     return builder.to_string();
 }
+
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.10
+SourceFileAttribute::SourceFileAttribute(u16 index)
+    : Attribute(AttributeType::SourceFile)
+    , m_index(move(index))
+{
+}
+
+ErrorOr<NonnullOwnPtr<SourceFileAttribute>> SourceFileAttribute::parse(ClassParser& class_parser)
+{
+    // The string referenced by the sourcefile_index item will contain the name of the source file from which this class file was compiled.
+    auto sourcefile_index = TRY(class_parser.read_u2());
+    return try_make<SourceFileAttribute>(sourcefile_index);
+}
+
+ErrorOr<String> SourceFileAttribute::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("SourceFile { "sv);
+    builder.appendff("index = {}", index());
+    builder.append(" }"sv);
+
+    return builder.to_string();
+}

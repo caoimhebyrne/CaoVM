@@ -22,6 +22,10 @@ enum class AttributeType {
     // The LineNumberTable attribute is an optional variable-length attribute in the attributes table of a Code attribute.
     // It may be used by debuggers to determine which part of the code array corresponds to a given line number in the original source file.
     LineNumberTable,
+
+    // The SourceFile attribute is an optional fixed-length attribute in the attributes table of a ClassFile structure (§4.1).
+    // It provides an index into the constant pool table, denoting the name of the original source file of this class.
+    SourceFile
 };
 
 class Attribute {
@@ -111,4 +115,19 @@ private:
     Vector<Entry> m_table;
 
     static ErrorOr<Entry> parse_entry(ClassParser& class_parser);
+};
+
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.10
+class SourceFileAttribute : public Attribute {
+public:
+    SourceFileAttribute(u16 index);
+
+    static ErrorOr<NonnullOwnPtr<SourceFileAttribute>> parse(ClassParser& class_parser);
+
+    ErrorOr<String> debug_description();
+
+    u16 index() { return m_index; };
+
+private:
+    u16 m_index;
 };
