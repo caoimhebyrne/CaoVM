@@ -71,6 +71,16 @@ ErrorOr<ClassFile> ClassParser::parse()
         fields.append(move(field));
     }
 
+    // The number of method_info structures in the fields table.
+    auto methods_length = TRY(this->read_u2());
+
+    // The method_info structures represent all methods declared by this class or interface type.
+    auto methods = Vector<NonnullOwnPtr<MethodInfo>>();
+    for (auto i = 0; i < methods_length; i++) {
+        auto method = TRY(this->parse_method(constant_pool));
+        methods.append(move(method));
+    }
+
     // Construct a class file struct
     ClassFile file {
         .magic = magic,
@@ -83,6 +93,7 @@ ErrorOr<ClassFile> ClassParser::parse()
         .super_class = super_class,
         .interfaces = interfaces,
         .fields = move(fields),
+        .methods = move(methods),
     };
 
     return file;
@@ -121,6 +132,28 @@ ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<Constan
     }
 
     return try_make<FieldInfo>(access_flags, name_index, descriptor_index, move(attributes));
+}
+
+ErrorOr<NonnullOwnPtr<MethodInfo>> ClassParser::parse_method(NonnullOwnPtr<ConstantPool> const& constant_pool)
+{
+    // Used to denote access permission to this field
+    auto access_flags = TRY(this->read_u2());
+
+    // An index in the constant pool table to the name of this field
+    auto name_index = TRY(this->read_u2());
+
+    // An index in the constant pool table to the descriptor for this field
+    auto descriptor_index = TRY(this->read_u2());
+
+    // The amount of attributes belonging to this field
+    auto attributes_count = TRY(this->read_u2());
+    auto attributes = Vector<NonnullOwnPtr<Attribute>>();
+    for (auto i = 0; i < attributes_count; i++) {
+        auto attribute = TRY(this->parse_attribute(constant_pool));
+        attributes.append(move(attribute));
+    }
+
+    return try_make<MethodInfo>(access_flags, name_index, descriptor_index, move(attributes));
 }
 
 ErrorOr<NonnullOwnPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)

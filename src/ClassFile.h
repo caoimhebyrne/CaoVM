@@ -34,6 +34,21 @@ enum MajorVersion : u16 {
     V17 = 61
 };
 
+// https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.6
+struct MethodInfo {
+    // The value of the access_flags item is a mask of flags used to denote access permission to this method.
+    u16 access_flags;
+
+    // The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) which represents a valid unqualified name denoting a method (§4.2.2).
+    u16 name_index;
+
+    // The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) which represents a valid method descriptor (§4.3.2).
+    u16 descriptor_index;
+
+    // A method can have any number of optional attributes associated with it.
+    Vector<NonnullOwnPtr<Attribute>> attributes;
+};
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.5
 struct FieldInfo {
     // The value of the access_flags item is a mask of flags used to denote access permission to and properties of this field.
@@ -85,6 +100,12 @@ struct ClassFile {
     // The fields table includes only those fields that are declared by this class or interface.
     // It does not include items representing fields that are inherited from superclasses or superinterfaces.
     Vector<NonnullOwnPtr<FieldInfo>> fields;
+
+    // Each value in the methods table must be a method_info structure(§4.6) giving a complete description of a method in this class or interface.
+    //
+    // The method_info structures represent all methods declared by this class or interface type.
+    // The methods table does not include items representing methods that are inherited from superclasses or superinterfaces.
+    Vector<NonnullOwnPtr<MethodInfo>> methods;
 };
 
 // Used for debug formatting
