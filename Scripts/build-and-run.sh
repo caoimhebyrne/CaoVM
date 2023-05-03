@@ -16,4 +16,4 @@ cmake --build .
 cd ..
 
 # Execute the outputted binary
-eval "${BUILD_DIRECTORY}/jvm"
+eval "${BUILD_DIRECTORY}/jvm $@"
