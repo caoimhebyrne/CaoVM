@@ -16,15 +16,15 @@ enum class AttributeType {
     ConstantValue
 };
 
-class AttributeInfo {
+class Attribute {
 public:
-    virtual ~AttributeInfo() = default;
+    virtual ~Attribute() = default;
     virtual ErrorOr<String> debug_description() = 0;
 
     AttributeType const& type() { return m_type; };
 
 protected:
-    AttributeInfo(AttributeType type)
+    Attribute(AttributeType type)
         : m_type(move(type))
     {
     }
@@ -35,8 +35,8 @@ private:
 
 namespace AK {
 template<>
-struct Formatter<AttributeInfo> : Formatter<StringView> {
-    ErrorOr<void> format(FormatBuilder& builder, AttributeInfo& attribute_info)
+struct Formatter<Attribute> : Formatter<StringView> {
+    ErrorOr<void> format(FormatBuilder& builder, Attribute& attribute_info)
     {
         return Formatter<StringView>::format(builder, TRY(attribute_info.debug_description()));
     }
@@ -45,11 +45,11 @@ struct Formatter<AttributeInfo> : Formatter<StringView> {
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2
-class ConstantValueAttributeInfo : public AttributeInfo {
+class ConstantValueAttribute : public Attribute {
 public:
-    ConstantValueAttributeInfo(u16 value_index);
+    ConstantValueAttribute(u16 value_index);
 
-    static ErrorOr<NonnullOwnPtr<ConstantValueAttributeInfo>> parse(ClassParser& class_parser);
+    static ErrorOr<NonnullOwnPtr<ConstantValueAttribute>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 

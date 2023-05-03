@@ -46,7 +46,7 @@ struct FieldInfo {
     u16 descriptor_index;
 
     // A field can have any number of optional attributes associated with it.
-    Vector<NonnullOwnPtr<AttributeInfo>> attributes;
+    Vector<NonnullOwnPtr<Attribute>> attributes;
 };
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html

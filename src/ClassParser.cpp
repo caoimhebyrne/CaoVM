@@ -114,7 +114,7 @@ ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<Constan
 
     // The amount of attributes belonging to this field
     auto attributes_count = TRY(this->read_u2());
-    auto attributes = Vector<NonnullOwnPtr<AttributeInfo>>();
+    auto attributes = Vector<NonnullOwnPtr<Attribute>>();
     for (auto i = 0; i < attributes_count; i++) {
         auto attribute = TRY(this->parse_attribute(constant_pool));
         attributes.append(move(attribute));
@@ -123,7 +123,7 @@ ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<Constan
     return try_make<FieldInfo>(access_flags, name_index, descriptor_index, move(attributes));
 }
 
-ErrorOr<NonnullOwnPtr<AttributeInfo>> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullOwnPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     // An index in the constant pool table to name of this attribute
     auto name_index = TRY(this->read_u2());
@@ -139,7 +139,7 @@ ErrorOr<NonnullOwnPtr<AttributeInfo>> ClassParser::parse_attribute(NonnullOwnPtr
     // The attribute name helps us to understand the data that we should read next
     auto attribute_name = static_cast<ConstantUTF8Info&>(*constant).data();
     if (attribute_name == "ConstantValue") {
-        return ConstantValueAttributeInfo::parse(*this);
+        return ConstantValueAttribute::parse(*this);
     } else {
         dbgln("Unimplemented attribute: {}", attribute_name);
         TODO();
