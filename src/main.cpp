@@ -12,8 +12,6 @@
 #include <LibCore/File.h>
 #include <LibMain/Main.h>
 
-#include "Interpreter/ConstantPool.h"
-
 #include "Parser/ClassFile.h"
 #include "Parser/ClassParser.h"
 #include "Parser/ConstantInfo.h"
@@ -40,7 +38,5 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
         }
     }
 
-    auto interpreted_constant_pool = Interpreter::ConstantPool::create(move(class_file.constant_pool));
-    TRY(interpreted_constant_pool->symbolicate_if_needed());
     return 0;
 }

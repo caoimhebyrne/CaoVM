@@ -21,8 +21,6 @@ include(CMake/FetchLagom.cmake)
 set(SOURCES
     src/main.cpp
 
-    src/Interpreter/ConstantPool.cpp
-
     src/Parser/Attribute.cpp
     src/Parser/ClassParser.cpp
     src/Parser/ConstantInfo.cpp
