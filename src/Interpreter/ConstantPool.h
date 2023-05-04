@@ -8,6 +8,7 @@
 
 #include "../Parser/ConstantInfo.h"
 #include "../Parser/ConstantPool.h"
+#include <AK/HashMap.h>
 #include <AK/NonnullOwnPtr.h>
 
 namespace Interpreter {
@@ -101,17 +102,17 @@ public:
 
     NonnullOwnPtr<Parser::ConstantPool> const& parsed_pool() { return m_parsed_pool; };
 
-    Vector<NonnullRefPtr<SymbolicReference>>& references() { return m_references; };
+    HashMap<u16, NonnullRefPtr<SymbolicReference>>& references() { return m_references; };
 
 private:
     NonnullOwnPtr<Parser::ConstantPool> m_parsed_pool;
 
-    Vector<NonnullRefPtr<SymbolicReference>> m_references;
+    HashMap<u16, NonnullRefPtr<SymbolicReference>> m_references;
 
-    ErrorOr<void> symbolicate_class(Parser::ConstantClassInfo& info);
-    ErrorOr<void> symbolicate_field(Parser::ConstantFieldReferenceInfo& info);
+    ErrorOr<NonnullRefPtr<ClassReference>> get_or_symbolicate_class(u16 constant_pool_index);
 
-    ErrorOr<NonnullRefPtr<ClassReference>> get_or_symbolicate_class(u16 class_index);
+    ErrorOr<NonnullRefPtr<ClassReference>> symbolicate_class(Parser::ConstantClassInfo& info);
+    ErrorOr<NonnullRefPtr<FieldReference>> symbolicate_field(Parser::ConstantFieldReferenceInfo& info);
 };
 
 }
