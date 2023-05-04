@@ -8,6 +8,8 @@
 
 #include <AK/String.h>
 
+namespace Parser {
+
 // Forward-declaration
 class ClassParser;
 class ConstantPool;
@@ -44,17 +46,6 @@ protected:
 private:
     AttributeType m_type;
 };
-
-namespace AK {
-template<>
-struct Formatter<Attribute> : Formatter<StringView> {
-    ErrorOr<void> format(FormatBuilder& builder, Attribute& attribute_info)
-    {
-        return Formatter<StringView>::format(builder, TRY(attribute_info.debug_description()));
-    }
-};
-
-}
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2
 class ConstantValueAttribute : public Attribute {
@@ -131,3 +122,16 @@ public:
 private:
     u16 m_index;
 };
+
+}
+
+namespace AK {
+template<>
+struct Formatter<Parser::Attribute> : Formatter<StringView> {
+    ErrorOr<void> format(FormatBuilder& builder, Parser::Attribute& attribute_info)
+    {
+        return Formatter<StringView>::format(builder, TRY(attribute_info.debug_description()));
+    }
+};
+
+}

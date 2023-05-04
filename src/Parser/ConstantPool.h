@@ -11,6 +11,8 @@
 #include <AK/Types.h>
 #include <AK/Vector.h>
 
+namespace Parser {
+
 // Forward-declaration
 class ConstantInfo;
 class ClassParser;
@@ -54,3 +56,5 @@ public:
 private:
     Vector<NonnullOwnPtr<ConstantInfo>> m_entries;
 };
+
+}

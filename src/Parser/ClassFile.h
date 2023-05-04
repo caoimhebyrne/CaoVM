@@ -13,6 +13,8 @@
 #include <AK/StringBuilder.h>
 #include <AK/Vector.h>
 
+namespace Parser {
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.1-200-B.2
 enum MajorVersion : u16 {
     V1_1 = 45,
@@ -111,12 +113,14 @@ struct ClassFile {
     Vector<NonnullOwnPtr<Attribute>> attributes;
 };
 
+}
+
 // Used for debug formatting
 namespace AK {
 
 template<>
-struct Formatter<ClassFile> : Formatter<StringView> {
-    ErrorOr<void> format(FormatBuilder& format_builder, ClassFile const& class_file)
+struct Formatter<Parser::ClassFile> : Formatter<StringView> {
+    ErrorOr<void> format(FormatBuilder& format_builder, Parser::ClassFile const& class_file)
     {
         StringBuilder builder;
         builder.append("ClassFile {\n"sv);

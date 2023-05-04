@@ -10,6 +10,8 @@
 #include <AK/BitStream.h>
 #include <AK/String.h>
 
+namespace Parser {
+
 ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& class_parser)
 {
     auto entries = Vector<NonnullOwnPtr<ConstantInfo>>();
@@ -63,4 +65,6 @@ ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& 
     }
 
     return make<ConstantPool>(move(entries));
+}
+
 }

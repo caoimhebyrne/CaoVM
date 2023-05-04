@@ -9,6 +9,8 @@
 #include "ConstantPool.h"
 #include <AK/BitStream.h>
 
+namespace Parser {
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.2
 ConstantValueAttribute::ConstantValueAttribute(u16 value_index)
     : Attribute(AttributeType::ConstantValue)
@@ -173,4 +175,6 @@ ErrorOr<String> SourceFileAttribute::debug_description()
     builder.append(" }"sv);
 
     return builder.to_string();
+}
+
 }

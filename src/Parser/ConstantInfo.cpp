@@ -9,6 +9,8 @@
 #include <AK/BitStream.h>
 #include <AK/NonnullOwnPtr.h>
 
+namespace Parser {
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.7
 ConstantUTF8Info::ConstantUTF8Info(String data)
     : ConstantInfo(ConstantPool::Tag::UTF8)
@@ -177,4 +179,6 @@ ErrorOr<String> ConstantNameAndTypeInfo::debug_description()
     builder.append(" }"sv);
 
     return builder.to_string();
+}
+
 }

@@ -10,6 +10,8 @@
 #include <AK/NonnullOwnPtr.h>
 #include <LibCore/File.h>
 
+namespace Parser {
+
 class ClassParser {
 public:
     ClassParser(NonnullOwnPtr<BigEndianInputBitStream> stream);
@@ -33,3 +35,5 @@ private:
 
     NonnullOwnPtr<BigEndianInputBitStream> m_stream;
 };
+
+}

@@ -12,10 +12,10 @@
 #include <LibCore/File.h>
 #include <LibMain/Main.h>
 
-#include "ClassFile.h"
-#include "ClassParser.h"
-#include "ConstantInfo.h"
-#include "ConstantPool.h"
+#include "Parser/ClassFile.h"
+#include "Parser/ClassParser.h"
+#include "Parser/ConstantInfo.h"
+#include "Parser/ConstantPool.h"
 
 ErrorOr<int> serenity_main(Main::Arguments arguments)
 {
@@ -26,7 +26,7 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
     args_parser->parse(arguments);
 
     auto file = TRY(Core::File::open("Example/Test.class"sv, Core::File::OpenMode::Read));
-    auto class_parser = TRY(ClassParser::create(move(file)));
+    auto class_parser = TRY(Parser::ClassParser::create(move(file)));
     auto class_file = TRY(class_parser->parse());
 
     dbgln("{}", class_file);

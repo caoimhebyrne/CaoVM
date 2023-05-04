@@ -9,6 +9,8 @@
 #include "ConstantPool.h"
 #include <AK/String.h>
 
+namespace Parser {
+
 // Forward declaration
 class ClassParser;
 
@@ -136,3 +138,5 @@ private:
     // The constant_pool entry at that index must be a CONSTANT_Utf8_info structure (§4.4.7) representing a valid field descriptor or method descriptor (§4.3.2, §4.3.3).
     u16 m_descriptor_index;
 };
+
+}

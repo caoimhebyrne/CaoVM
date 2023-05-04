@@ -20,10 +20,10 @@ include(CMake/FetchLagom.cmake)
 
 set(SOURCES
     src/main.cpp
-    src/Attribute.cpp
-    src/ClassParser.cpp
-    src/ConstantInfo.cpp
-    src/ConstantPool.cpp
+    src/Parser/Attribute.cpp
+    src/Parser/ClassParser.cpp
+    src/Parser/ConstantInfo.cpp
+    src/Parser/ConstantPool.cpp
 )
 
 add_executable(jvm ${SOURCES})

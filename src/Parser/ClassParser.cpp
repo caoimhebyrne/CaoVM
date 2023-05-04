@@ -9,6 +9,8 @@
 #include <AK/MaybeOwned.h>
 #include <AK/String.h>
 
+namespace Parser {
+
 ClassParser::ClassParser(NonnullOwnPtr<BigEndianInputBitStream> stream)
     : m_stream(move(stream))
 {
@@ -209,4 +211,6 @@ ErrorOr<u16> ClassParser::read_u2()
 ErrorOr<u32> ClassParser::read_u4()
 {
     return m_stream->read_bits<u32>(32);
+}
+
 }
