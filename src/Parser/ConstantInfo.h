@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "../ConstantTag.h"
 #include "ConstantPool.h"
 #include <AK/String.h>
 
@@ -18,18 +19,18 @@ class ConstantInfo {
 public:
     virtual ~ConstantInfo() = default;
 
-    ConstantPool::Tag const& tag() { return m_tag; };
+    Constant::Tag const& tag() { return m_tag; };
 
     virtual ErrorOr<String> debug_description() = 0;
 
 protected:
-    ConstantInfo(ConstantPool::Tag tag)
+    ConstantInfo(Constant::Tag tag)
         : m_tag(tag)
     {
     }
 
 private:
-    ConstantPool::Tag m_tag;
+    Constant::Tag m_tag;
 };
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.7
@@ -66,9 +67,9 @@ private:
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2
 class ConstantMemberReferenceInfo : public ConstantInfo {
 public:
-    ConstantMemberReferenceInfo(ConstantPool::Tag tag, u16 name_index, u16 descriptor_index);
+    ConstantMemberReferenceInfo(Constant::Tag tag, u16 name_index, u16 descriptor_index);
 
-    static ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> parse(ConstantPool::Tag tag, ClassParser& class_parser);
+    static ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> parse(Constant::Tag tag, ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 

@@ -13,20 +13,20 @@ namespace Parser {
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.7
 ConstantUTF8Info::ConstantUTF8Info(String data)
-    : ConstantInfo(ConstantPool::Tag::UTF8)
+    : ConstantInfo(Constant::Tag::UTF8)
     , m_data(data)
 {
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.1
 ConstantClassInfo::ConstantClassInfo(u16 name_index)
-    : ConstantInfo(ConstantPool::Tag::Class)
+    : ConstantInfo(Constant::Tag::Class)
     , m_name_index(move(name_index))
 {
 }
 
 // // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.2
-ConstantMemberReferenceInfo::ConstantMemberReferenceInfo(ConstantPool::Tag tag, u16 class_index, u16 name_and_type_index)
+ConstantMemberReferenceInfo::ConstantMemberReferenceInfo(Constant::Tag tag, u16 class_index, u16 name_and_type_index)
     : ConstantInfo(tag)
     , m_class_index(move(class_index))
     , m_name_and_type_index(move(name_and_type_index))
@@ -35,21 +35,21 @@ ConstantMemberReferenceInfo::ConstantMemberReferenceInfo(ConstantPool::Tag tag, 
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.3
 ConstantStringInfo::ConstantStringInfo(u16 string_index)
-    : ConstantInfo(ConstantPool::Tag::String)
+    : ConstantInfo(Constant::Tag::String)
     , m_index(string_index)
 {
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.4
 ConstantIntegerInfo::ConstantIntegerInfo(u32 value)
-    : ConstantInfo(ConstantPool::Tag::Integer)
+    : ConstantInfo(Constant::Tag::Integer)
     , m_value(value)
 {
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4.6
 ConstantNameAndTypeInfo::ConstantNameAndTypeInfo(u16 name_index, u16 descriptor_index)
-    : ConstantInfo(ConstantPool::Tag::NameAndType)
+    : ConstantInfo(Constant::Tag::NameAndType)
     , m_name_index(move(name_index))
     , m_descriptor_index(move(descriptor_index))
 {
@@ -77,7 +77,7 @@ ErrorOr<NonnullOwnPtr<ConstantClassInfo>> ConstantClassInfo::parse(ClassParser& 
     return try_make<ConstantClassInfo>(name_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo::parse(ConstantPool::Tag tag, ClassParser& class_parser)
+ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo::parse(Constant::Tag tag, ClassParser& class_parser)
 {
     // u2 class_index;
     auto class_index = TRY(class_parser.read_u2());

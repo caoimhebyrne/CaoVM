@@ -6,6 +6,7 @@
 
 #pragma once
 
+#include "../ConstantTag.h"
 #include "Attribute.h"
 #include "ConstantInfo.h"
 #include "ConstantPool.h"

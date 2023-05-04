@@ -22,37 +22,37 @@ ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& 
         auto tag = TRY(class_parser.read_u1());
 
         switch (tag) {
-        case ConstantPool::Tag::FieldReference: {
-            entries.append(TRY(ConstantMemberReferenceInfo::parse(ConstantPool::Tag::FieldReference, class_parser)));
+        case Constant::Tag::FieldReference: {
+            entries.append(TRY(ConstantMemberReferenceInfo::parse(Constant::Tag::FieldReference, class_parser)));
             break;
         }
 
-        case ConstantPool::Tag::MethodReference: {
-            entries.append(TRY(ConstantMemberReferenceInfo::parse(ConstantPool::Tag::MethodReference, class_parser)));
+        case Constant::Tag::MethodReference: {
+            entries.append(TRY(ConstantMemberReferenceInfo::parse(Constant::Tag::MethodReference, class_parser)));
             break;
         }
 
-        case ConstantPool::Tag::Class: {
+        case Constant::Tag::Class: {
             entries.append(TRY(ConstantClassInfo::parse(class_parser)));
             break;
         }
 
-        case ConstantPool::Tag::NameAndType: {
+        case Constant::Tag::NameAndType: {
             entries.append(TRY(ConstantNameAndTypeInfo::parse(class_parser)));
             break;
         }
 
-        case ConstantPool::Tag::UTF8: {
+        case Constant::Tag::UTF8: {
             entries.append(TRY(ConstantUTF8Info::parse(class_parser)));
             break;
         }
 
-        case ConstantPool::Tag::String: {
+        case Constant::Tag::String: {
             entries.append(TRY(ConstantStringInfo::parse(class_parser)));
             break;
         }
 
-        case ConstantPool::Tag::Integer: {
+        case Constant::Tag::Integer: {
             entries.append(TRY(ConstantIntegerInfo::parse(class_parser)));
             break;
         }

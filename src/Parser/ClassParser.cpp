@@ -119,7 +119,7 @@ ErrorOr<ConstantClassInfo> ClassParser::parse_interface(NonnullOwnPtr<ConstantPo
     auto const& constant = constant_pool->entries().at(index);
 
     // The constant_pool entry at each value of interfaces[i], where 0 ≤ i < interfaces_count, must be a CONSTANT_Class_info structure
-    VERIFY(constant->tag() == ConstantPool::Tag::Class);
+    VERIFY(constant->tag() == Constant::Tag::Class);
 
     // ~~ Fancy casting woooo ~~
     return static_cast<ConstantClassInfo&>(*constant);
@@ -180,7 +180,7 @@ ErrorOr<NonnullOwnPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<Con
 
     // The constant_pool entry at attribute_name_index must be a CONSTANT_Utf8_info structure (§4.4.7) representing the name of the attribute.
     auto const& constant = constant_pool->entries().at(name_index - 1);
-    VERIFY(constant->tag() == ConstantPool::Tag::UTF8);
+    VERIFY(constant->tag() == Constant::Tag::UTF8);
 
     // The attribute name helps us to understand the data that we should read next
     auto attribute_name = static_cast<ConstantUTF8Info&>(*constant).data();
