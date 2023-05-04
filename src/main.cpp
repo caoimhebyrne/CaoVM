@@ -12,6 +12,8 @@
 #include <LibCore/File.h>
 #include <LibMain/Main.h>
 
+#include "Interpreter/SymbolicatedConstantPool.h"
+
 #include "Parser/ClassFile.h"
 #include "Parser/ClassParser.h"
 #include "Parser/ConstantInfo.h"
@@ -37,6 +39,11 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
             dbgln("{}: {}", index, TRY(constant->debug_description()));
         }
     }
+
+    // Attempt to symbolicate the parsed constant pool
+    // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html#jvms-5.1
+    auto symbolicated_constant_pool = Interpreter::SymbolicatedConstantPool::create(move(class_file.constant_pool));
+    TRY(symbolicated_constant_pool->symbolicate());
 
     return 0;
 }
