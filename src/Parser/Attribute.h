@@ -30,7 +30,7 @@ enum class AttributeType {
     SourceFile
 };
 
-class Attribute {
+class Attribute : public RefCounted<Attribute> {
 public:
     virtual ~Attribute() = default;
     virtual ErrorOr<String> debug_description() = 0;
@@ -52,7 +52,7 @@ class ConstantValueAttribute : public Attribute {
 public:
     ConstantValueAttribute(u16 value_index);
 
-    static ErrorOr<NonnullOwnPtr<ConstantValueAttribute>> parse(ClassParser& class_parser);
+    static ErrorOr<NonnullRefPtr<ConstantValueAttribute>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 
@@ -65,22 +65,22 @@ private:
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.3
 class CodeAttribute : public Attribute {
 public:
-    CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vector<NonnullOwnPtr<Attribute>> attributes);
+    CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vector<NonnullRefPtr<Attribute>> attributes);
 
-    static ErrorOr<NonnullOwnPtr<CodeAttribute>> parse(ClassParser& class_parser, NonnullOwnPtr<ConstantPool> const& constant_pool);
+    static ErrorOr<NonnullRefPtr<CodeAttribute>> parse(ClassParser& class_parser, NonnullOwnPtr<ConstantPool> const& constant_pool);
 
     ErrorOr<String> debug_description();
 
     u16 max_stack() { return m_max_stack; };
     u16 max_locals() { return m_max_locals; };
     ByteBuffer const& code() { return m_code; };
-    Vector<NonnullOwnPtr<Attribute>> const& attributes() { return m_attributes; };
+    Vector<NonnullRefPtr<Attribute>> const& attributes() { return m_attributes; };
 
 private:
     u16 m_max_stack;
     u16 m_max_locals;
     ByteBuffer m_code;
-    Vector<NonnullOwnPtr<Attribute>> m_attributes;
+    Vector<NonnullRefPtr<Attribute>> m_attributes;
 };
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.12
@@ -96,7 +96,7 @@ public:
 
     LineNumberTableAttribute(Vector<Entry> table);
 
-    static ErrorOr<NonnullOwnPtr<LineNumberTableAttribute>> parse(ClassParser& class_parser);
+    static ErrorOr<NonnullRefPtr<LineNumberTableAttribute>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 
@@ -113,7 +113,7 @@ class SourceFileAttribute : public Attribute {
 public:
     SourceFileAttribute(u16 index);
 
-    static ErrorOr<NonnullOwnPtr<SourceFileAttribute>> parse(ClassParser& class_parser);
+    static ErrorOr<NonnullRefPtr<SourceFileAttribute>> parse(ClassParser& class_parser);
 
     ErrorOr<String> debug_description();
 

@@ -33,7 +33,7 @@ ErrorOr<NonnullRefPtr<SymbolicatedClassReference>> SymbolicatedClassReference::c
     VERIFY(potential_class_info->tag() == Constant::Tag::Class);
 
     // (Cast `potential_class_info` to the expected type)
-    auto class_info = static_cast<Parser::ConstantClassInfo&>(*potential_class_info);
+    auto& class_info = static_cast<Parser::ConstantClassInfo&>(*potential_class_info);
 
     // The value of the `name_index` item must be a valid index into the constant_pool table.
     auto const& potential_utf8_constant = symbolicated_pool->parsed_pool()->entries().at(class_info.name_index() - 1);
@@ -42,7 +42,7 @@ ErrorOr<NonnullRefPtr<SymbolicatedClassReference>> SymbolicatedClassReference::c
     VERIFY(potential_utf8_constant->tag() == Constant::Tag::UTF8);
 
     // (Cast `potential_class_info` to the expected type)
-    auto name_utf8 = static_cast<Parser::ConstantUTF8Info&>(*potential_utf8_constant);
+    auto& name_utf8 = static_cast<Parser::ConstantUTF8Info&>(*potential_utf8_constant);
 
     // For a nonarray class or an interface, the name is the binary name of the class or interface.
     auto name = name_utf8.data();
@@ -88,7 +88,7 @@ ErrorOr<NonnullRefPtr<SymbolicatedMethodReference>> SymbolicatedMethodReference:
     VERIFY(potential_method_info->tag() == Constant::Tag::MethodReference);
 
     // (Cast `potential_method_info` to the expected type)
-    auto method_info = static_cast<Parser::ConstantMethodReferenceInfo&>(*potential_method_info);
+    auto& method_info = static_cast<Parser::ConstantMethodReferenceInfo&>(*potential_method_info);
 
     // The value of the `name_and_type_index` item must be a valid index into the constant_pool table.
     auto const& potential_name_and_type_constant = symbolicated_pool->parsed_pool()->entries().at(method_info.name_and_type_index() - 1);
@@ -97,14 +97,14 @@ ErrorOr<NonnullRefPtr<SymbolicatedMethodReference>> SymbolicatedMethodReference:
     VERIFY(potential_name_and_type_constant->tag() == Constant::Tag::NameAndType);
 
     // (Cast `potential_name_and_type_constant` to the expected type)
-    auto name_and_type = static_cast<Parser::ConstantNameAndTypeInfo&>(*potential_name_and_type_constant);
+    auto& name_and_type = static_cast<Parser::ConstantNameAndTypeInfo&>(*potential_name_and_type_constant);
 
     // The value of the `name_index` item must be a valid index into the constant_pool table.
     auto const& potential_name_utf8_constant = symbolicated_pool->parsed_pool()->entries().at(name_and_type.name_index() - 1);
 
     // The constant_pool entry at that index must be a CONSTANT_Utf8_info structure.
     VERIFY(potential_name_utf8_constant->tag() == Constant::Tag::UTF8);
-    auto name_utf8 = static_cast<Parser::ConstantUTF8Info&>(*potential_name_utf8_constant);
+    auto& name_utf8 = static_cast<Parser::ConstantUTF8Info&>(*potential_name_utf8_constant);
 
     // Represents either an unqualified name, or the special method name `<init>`
     auto name = name_utf8.data();
@@ -116,7 +116,7 @@ ErrorOr<NonnullRefPtr<SymbolicatedMethodReference>> SymbolicatedMethodReference:
     VERIFY(potential_descriptor_utf8_constant->tag() == Constant::Tag::UTF8);
 
     // (Cast `potential_descriptor_utf8_constant` to the expected type)
-    auto descriptor_utf8 = static_cast<Parser::ConstantUTF8Info&>(*potential_descriptor_utf8_constant);
+    auto& descriptor_utf8 = static_cast<Parser::ConstantUTF8Info&>(*potential_descriptor_utf8_constant);
 
     // Represents a valid field or method (in this case method) descriptor.
     auto descriptor = descriptor_utf8.data();

@@ -14,7 +14,7 @@ namespace Parser {
 
 ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& class_parser)
 {
-    auto entries = Vector<NonnullOwnPtr<ConstantInfo>>();
+    auto entries = Vector<NonnullRefPtr<ConstantInfo>>();
 
     for (int i = 0; i < size; i++) {
         // The constant_pool table is indexed from 1 to constant_pool_count - 1.

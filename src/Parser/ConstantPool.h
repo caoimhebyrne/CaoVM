@@ -20,17 +20,17 @@ class ClassParser;
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 class ConstantPool {
 public:
-    ConstantPool(Vector<NonnullOwnPtr<ConstantInfo>> entries)
+    ConstantPool(Vector<NonnullRefPtr<ConstantInfo>> entries)
         : m_entries(move(entries))
     {
     }
 
     static ErrorOr<NonnullOwnPtr<ConstantPool>> parse(u16 size, ClassParser& class_parser);
 
-    Vector<NonnullOwnPtr<ConstantInfo>> const& entries() { return m_entries; };
+    Vector<NonnullRefPtr<ConstantInfo>> const& entries() { return m_entries; };
 
 private:
-    Vector<NonnullOwnPtr<ConstantInfo>> m_entries;
+    Vector<NonnullRefPtr<ConstantInfo>> m_entries;
 };
 
 }

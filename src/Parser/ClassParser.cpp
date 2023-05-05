@@ -56,7 +56,7 @@ ErrorOr<ClassFile> ClassParser::parse()
 
     // The direct super-interfaces of this class/interface
     auto interfaces_length = TRY(this->read_u2());
-    auto interfaces = Vector<ConstantClassInfo>();
+    auto interfaces = Vector<NonnullRefPtr<ConstantClassInfo>>();
     for (auto i = 0; i < interfaces_length; i++) {
         // Each "interface" is just a reference to an index in the constant pool table
         auto interface_info = TRY(this->parse_interface(constant_pool));
@@ -87,7 +87,7 @@ ErrorOr<ClassFile> ClassParser::parse()
     auto attributes_length = TRY(this->read_u2());
 
     // A class can have any number of optional attributes associated with it.
-    auto attributes = Vector<NonnullOwnPtr<Attribute>>();
+    auto attributes = Vector<NonnullRefPtr<Attribute>>();
     for (auto i = 0; i < attributes_length; i++) {
         auto attribute = TRY(this->parse_attribute(constant_pool));
         attributes.append(move(attribute));
@@ -112,17 +112,18 @@ ErrorOr<ClassFile> ClassParser::parse()
     return file;
 }
 
-ErrorOr<ConstantClassInfo> ClassParser::parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullRefPtr<ConstantClassInfo>> ClassParser::parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     // Each value in ther interfaces array is an index into the constant pool table
     auto index = TRY(this->read_u2());
-    auto const& constant = constant_pool->entries().at(index);
+    ConstantInfo* constant = constant_pool->entries().at(index);
 
     // The constant_pool entry at each value of interfaces[i], where 0 ≤ i < interfaces_count, must be a CONSTANT_Class_info structure
     VERIFY(constant->tag() == Constant::Tag::Class);
 
     // ~~ Fancy casting woooo ~~
-    return static_cast<ConstantClassInfo&>(*constant);
+    auto& casted_reference = static_cast<ConstantClassInfo&>(*constant);
+    return adopt_ref(casted_reference);
 }
 
 ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool)
@@ -138,10 +139,10 @@ ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<Constan
 
     // The amount of attributes belonging to this field
     auto attributes_count = TRY(this->read_u2());
-    auto attributes = Vector<NonnullOwnPtr<Attribute>>();
+    auto attributes = Vector<NonnullRefPtr<Attribute>>();
     for (auto i = 0; i < attributes_count; i++) {
         auto attribute = TRY(this->parse_attribute(constant_pool));
-        attributes.append(move(attribute));
+        attributes.append(attribute);
     }
 
     return try_make<FieldInfo>(access_flags, name_index, descriptor_index, move(attributes));
@@ -160,16 +161,16 @@ ErrorOr<NonnullOwnPtr<MethodInfo>> ClassParser::parse_method(NonnullOwnPtr<Const
 
     // The amount of attributes belonging to this field
     auto attributes_count = TRY(this->read_u2());
-    auto attributes = Vector<NonnullOwnPtr<Attribute>>();
+    auto attributes = Vector<NonnullRefPtr<Attribute>>();
     for (auto i = 0; i < attributes_count; i++) {
         auto attribute = TRY(this->parse_attribute(constant_pool));
-        attributes.append(move(attribute));
+        attributes.append(attribute);
     }
 
     return try_make<MethodInfo>(access_flags, name_index, descriptor_index, move(attributes));
 }
 
-ErrorOr<NonnullOwnPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullRefPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     // An index in the constant pool table to name of this attribute
     auto name_index = TRY(this->read_u2());

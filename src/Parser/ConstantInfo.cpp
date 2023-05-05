@@ -7,7 +7,7 @@
 #include "ConstantInfo.h"
 #include "ClassParser.h"
 #include <AK/BitStream.h>
-#include <AK/NonnullOwnPtr.h>
+#include <AK/NonnullRefPtr.h>
 
 namespace Parser {
 
@@ -55,7 +55,7 @@ ConstantNameAndTypeInfo::ConstantNameAndTypeInfo(u16 name_index, u16 descriptor_
 {
 }
 
-ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> ConstantUTF8Info::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantUTF8Info>> ConstantUTF8Info::parse(ClassParser& class_parser)
 {
     // The value of the length item gives the number of bytes in the bytes array (not the length of the resulting string).
     auto length = TRY(class_parser.read_u2());
@@ -67,17 +67,17 @@ ErrorOr<NonnullOwnPtr<ConstantUTF8Info>> ConstantUTF8Info::parse(ClassParser& cl
 
     // Convert the bytest to a UTF-8 String
     auto string = TRY(String::from_utf8(buffer));
-    return try_make<ConstantUTF8Info>(string);
+    return try_make_ref_counted<ConstantUTF8Info>(string);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantClassInfo>> ConstantClassInfo::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantClassInfo>> ConstantClassInfo::parse(ClassParser& class_parser)
 {
     // u2 name_index;
     auto name_index = TRY(class_parser.read_u2());
-    return try_make<ConstantClassInfo>(name_index);
+    return try_make_ref_counted<ConstantClassInfo>(name_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo::parse(Constant::Tag tag, ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo::parse(Constant::Tag tag, ClassParser& class_parser)
 {
     // u2 class_index;
     auto class_index = TRY(class_parser.read_u2());
@@ -85,24 +85,24 @@ ErrorOr<NonnullOwnPtr<ConstantMemberReferenceInfo>> ConstantMemberReferenceInfo:
     // u2 name_and_type_index;
     auto name_and_type_index = TRY(class_parser.read_u2());
 
-    return try_make<ConstantMemberReferenceInfo>(tag, class_index, name_and_type_index);
+    return try_make_ref_counted<ConstantMemberReferenceInfo>(tag, class_index, name_and_type_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantStringInfo>> ConstantStringInfo::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantStringInfo>> ConstantStringInfo::parse(ClassParser& class_parser)
 {
     // u2 string_index;
     auto string_index = TRY(class_parser.read_u2());
-    return try_make<ConstantStringInfo>(string_index);
+    return try_make_ref_counted<ConstantStringInfo>(string_index);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantIntegerInfo>> ConstantIntegerInfo::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantIntegerInfo>> ConstantIntegerInfo::parse(ClassParser& class_parser)
 {
     // u4 bytes;
     auto value = TRY(class_parser.read_u4());
-    return try_make<ConstantIntegerInfo>(value);
+    return try_make_ref_counted<ConstantIntegerInfo>(value);
 }
 
-ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> ConstantNameAndTypeInfo::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantNameAndTypeInfo>> ConstantNameAndTypeInfo::parse(ClassParser& class_parser)
 {
     // u2 name_index;
     auto name_index = TRY(class_parser.read_u2());
@@ -110,7 +110,7 @@ ErrorOr<NonnullOwnPtr<ConstantNameAndTypeInfo>> ConstantNameAndTypeInfo::parse(C
     // u2 descriptor_index;
     auto descriptor_index = TRY(class_parser.read_u2());
 
-    return try_make<ConstantNameAndTypeInfo>(name_index, descriptor_index);
+    return try_make_ref_counted<ConstantNameAndTypeInfo>(name_index, descriptor_index);
 }
 
 ErrorOr<String> ConstantUTF8Info::debug_description()

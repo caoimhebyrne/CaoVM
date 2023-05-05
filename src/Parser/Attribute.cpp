@@ -18,11 +18,11 @@ ConstantValueAttribute::ConstantValueAttribute(u16 value_index)
 {
 }
 
-ErrorOr<NonnullOwnPtr<ConstantValueAttribute>> ConstantValueAttribute::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantValueAttribute>> ConstantValueAttribute::parse(ClassParser& class_parser)
 {
     // The constant_pool entry at this index gives the value represented by this attribute
     auto constant_value_index = TRY(class_parser.read_u2());
-    return try_make<ConstantValueAttribute>(constant_value_index);
+    return try_make_ref_counted<ConstantValueAttribute>(constant_value_index);
 }
 
 ErrorOr<String> ConstantValueAttribute::debug_description()
@@ -37,7 +37,7 @@ ErrorOr<String> ConstantValueAttribute::debug_description()
 }
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.7.3
-CodeAttribute::CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vector<NonnullOwnPtr<Attribute>> attributes)
+CodeAttribute::CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vector<NonnullRefPtr<Attribute>> attributes)
     : Attribute(AttributeType::Code)
     , m_max_stack(move(max_stack))
     , m_max_locals(move(max_locals))
@@ -46,7 +46,7 @@ CodeAttribute::CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vec
 {
 }
 
-ErrorOr<NonnullOwnPtr<CodeAttribute>> CodeAttribute::parse(ClassParser& class_parser, NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullRefPtr<CodeAttribute>> CodeAttribute::parse(ClassParser& class_parser, NonnullOwnPtr<ConstantPool> const& constant_pool)
 {
     auto max_stack = TRY(class_parser.read_u2());
     auto max_locals = TRY(class_parser.read_u2());
@@ -64,13 +64,13 @@ ErrorOr<NonnullOwnPtr<CodeAttribute>> CodeAttribute::parse(ClassParser& class_pa
     TRY(class_parser.stream()->discard(exception_table_length * 64));
 
     auto attributes_count = TRY(class_parser.read_u2());
-    auto attributes = Vector<NonnullOwnPtr<Attribute>>();
+    auto attributes = Vector<NonnullRefPtr<Attribute>>();
     for (auto i = 0; i < attributes_count; i++) {
         auto attribute = TRY(class_parser.parse_attribute(constant_pool));
         attributes.append(move(attribute));
     }
 
-    return try_make<CodeAttribute>(max_stack, max_locals, code, move(attributes));
+    return try_make_ref_counted<CodeAttribute>(max_stack, max_locals, code, move(attributes));
 }
 
 ErrorOr<String> CodeAttribute::debug_description()
@@ -99,7 +99,7 @@ LineNumberTableAttribute::LineNumberTableAttribute(Vector<LineNumberTableAttribu
 {
 }
 
-ErrorOr<NonnullOwnPtr<LineNumberTableAttribute>> LineNumberTableAttribute::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<LineNumberTableAttribute>> LineNumberTableAttribute::parse(ClassParser& class_parser)
 {
     auto line_number_table_length = TRY(class_parser.read_u2());
     auto table = Vector<LineNumberTableAttribute::Entry>();
@@ -109,7 +109,7 @@ ErrorOr<NonnullOwnPtr<LineNumberTableAttribute>> LineNumberTableAttribute::parse
         table.append(entry);
     }
 
-    return make<LineNumberTableAttribute>(table);
+    return try_make_ref_counted<LineNumberTableAttribute>(table);
 }
 
 ErrorOr<LineNumberTableAttribute::Entry> LineNumberTableAttribute::parse_entry(ClassParser& class_parser)
@@ -159,11 +159,11 @@ SourceFileAttribute::SourceFileAttribute(u16 index)
 {
 }
 
-ErrorOr<NonnullOwnPtr<SourceFileAttribute>> SourceFileAttribute::parse(ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<SourceFileAttribute>> SourceFileAttribute::parse(ClassParser& class_parser)
 {
     // The string referenced by the sourcefile_index item will contain the name of the source file from which this class file was compiled.
     auto sourcefile_index = TRY(class_parser.read_u2());
-    return try_make<SourceFileAttribute>(sourcefile_index);
+    return try_make_ref_counted<SourceFileAttribute>(sourcefile_index);
 }
 
 ErrorOr<String> SourceFileAttribute::debug_description()

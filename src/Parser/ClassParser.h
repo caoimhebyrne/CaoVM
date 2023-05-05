@@ -19,7 +19,7 @@ public:
     static ErrorOr<NonnullOwnPtr<ClassParser>> create(NonnullOwnPtr<Core::File> stream);
 
     ErrorOr<ClassFile> parse();
-    ErrorOr<NonnullOwnPtr<Attribute>> parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool);
+    ErrorOr<NonnullRefPtr<Attribute>> parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool);
 
     // The JVM spec defines a few data types for unsigned integers, werid naming but sure...
     ErrorOr<u8> read_u1();
@@ -29,7 +29,7 @@ public:
     NonnullOwnPtr<BigEndianInputBitStream> const& stream() { return m_stream; };
 
 private:
-    ErrorOr<ConstantClassInfo> parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool);
+    ErrorOr<NonnullRefPtr<ConstantClassInfo>> parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool);
     ErrorOr<NonnullOwnPtr<FieldInfo>> parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool);
     ErrorOr<NonnullOwnPtr<MethodInfo>> parse_method(NonnullOwnPtr<ConstantPool> const& constant_pool);
 
