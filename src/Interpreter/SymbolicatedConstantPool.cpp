@@ -76,12 +76,6 @@ ErrorOr<void> SymbolicatedConstantPool::symbolicate()
         }
     }
 
-    // FIXME: Remove this, only used for debugging
-    dbgln("Symbolicated {} constant pool entries:", entries().size());
-    for (auto entry : entries()) {
-        dbgln("  - {}: {}", entry.key, TRY(entry.value->debug_description()));
-    }
-
     return {};
 }
 
