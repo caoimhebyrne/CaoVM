@@ -17,6 +17,11 @@ namespace Parser {
 class ConstantInfo;
 class ClassParser;
 
+class ConstantMethodReferenceInfo;
+class ConstantNameAndTypeInfo;
+class ConstantUTF8Info;
+class ConstantClassInfo;
+
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 class ConstantPool {
 public:
@@ -28,6 +33,18 @@ public:
     static ErrorOr<NonnullOwnPtr<ConstantPool>> parse(u16 size, ClassParser& class_parser);
 
     Vector<NonnullRefPtr<ConstantInfo>> const& entries() { return m_entries; };
+
+    // Attempts to read a method reference from the constant pool
+    ErrorOr<NonnullRefPtr<ConstantMethodReferenceInfo>> method_reference_at(u16 index);
+
+    // Attempts to read a name and type from the constant pool
+    ErrorOr<NonnullRefPtr<ConstantNameAndTypeInfo>> name_and_type_at(u16 index);
+
+    // Attempts to read a utf8 constant from the constant pool
+    ErrorOr<NonnullRefPtr<ConstantUTF8Info>> utf8_at(u16 index);
+
+    // Attempts to read a class' information from the constant pool
+    ErrorOr<NonnullRefPtr<ConstantClassInfo>> class_at(u16 index);
 
 private:
     Vector<NonnullRefPtr<ConstantInfo>> m_entries;

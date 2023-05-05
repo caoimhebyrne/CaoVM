@@ -67,4 +67,52 @@ ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& 
     return make<ConstantPool>(move(entries));
 }
 
+// Attempts to read a method reference from the constant pool
+ErrorOr<NonnullRefPtr<ConstantMethodReferenceInfo>> ConstantPool::method_reference_at(u16 index)
+{
+    // The value of the `index` item must be a valid index into the constant_pool table.
+    auto const& entry = entries().at(index - 1);
+
+    // The constant_pool entry at that index must be a CONSTANT_Methodref_info structure.
+    VERIFY(entry->tag() == Constant::Tag::MethodReference);
+
+    return static_cast<Parser::ConstantMethodReferenceInfo&>(*entry);
+}
+
+// Attempts to read a method reference from the constant pool
+ErrorOr<NonnullRefPtr<ConstantNameAndTypeInfo>> ConstantPool::name_and_type_at(u16 index)
+{
+    // The value of the `index` item must be a valid index into the constant_pool table.
+    auto const& entry = entries().at(index - 1);
+
+    // The constant_pool entry at that index must be a CONSTANT_NameAndType_info structure.
+    VERIFY(entry->tag() == Constant::Tag::NameAndType);
+
+    return static_cast<Parser::ConstantNameAndTypeInfo&>(*entry);
+}
+
+// Attempts to read a utf8 constant from the constant pool
+ErrorOr<NonnullRefPtr<ConstantUTF8Info>> ConstantPool::utf8_at(u16 index)
+{
+    // The value of the `index` item must be a valid index into the constant_pool table.
+    auto const& entry = entries().at(index - 1);
+
+    // The constant_pool entry at that index must be a CONSTANT_UTF8_info structure.
+    VERIFY(entry->tag() == Constant::Tag::UTF8);
+
+    return static_cast<Parser::ConstantUTF8Info&>(*entry);
+}
+
+// Attempts to read a class' information from the constant pool
+ErrorOr<NonnullRefPtr<ConstantClassInfo>> ConstantPool::class_at(u16 index)
+{
+    // The value of the `index` item must be a valid index into the constant_pool table.
+    auto const& entry = entries().at(index - 1);
+
+    // The constant_pool entry at that index must be a CONSTANT_Class_info structure.
+    VERIFY(entry->tag() == Constant::Tag::Class);
+
+    return static_cast<Parser::ConstantClassInfo&>(*entry);
+}
+
 }
