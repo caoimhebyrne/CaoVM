@@ -70,7 +70,56 @@ SymbolicatedMethodReference::SymbolicatedMethodReference(u16 index, String name,
 ErrorOr<NonnullRefPtr<SymbolicatedMethodReference>> SymbolicatedMethodReference::create(u16 index, SymbolicatedConstantPool* symbolicated_pool)
 {
     // The entry at the index must be a Constant_Methodref_info structure.
-    auto const& method_info = TRY(symbolicated_pool->parsed_pool()->method_reference_at(index));
+    auto const& field_info = TRY(symbolicated_pool->parsed_pool()->method_reference_at(index));
+
+    // The entry at `name_and_type_index` must be a CONSTANT_NameAndType_info structure.
+    auto const& name_and_type = TRY(symbolicated_pool->parsed_pool()->name_and_type_at(field_info->name_and_type_index()));
+
+    // The entries at `name_index` and `descriptor_index` must be CONSTANT_Utf8_info structures.
+    auto const& name_utf8 = TRY(symbolicated_pool->parsed_pool()->utf8_at(name_and_type->name_index()));
+    auto const& descriptor_utf8 = TRY(symbolicated_pool->parsed_pool()->utf8_at(name_and_type->descriptor_index()));
+
+    // Represents the field's name
+    auto name = name_utf8->data();
+
+    // Represents a valid field or method (in this case field) descriptor.
+    auto descriptor = descriptor_utf8->data();
+
+    // The value of the `class_index` type must correspond to a SymbolicatedClassReference.
+    auto owner = TRY(symbolicated_pool->get_or_symbolicate_class(field_info->class_index()));
+
+    return try_make_ref_counted<SymbolicatedMethodReference>(index, name, descriptor, owner);
+}
+
+// Used for debugging
+ErrorOr<String> SymbolicatedMethodReference::debug_description()
+{
+    StringBuilder builder;
+
+    builder.append("SymbolicatedMethodReference { "sv);
+    builder.appendff("name = \"{}\", ", this->name());
+    builder.appendff("descriptor = \"{}\", ", this->descriptor());
+    builder.appendff("owner = {}", TRY(this->owner()->debug_description()));
+    builder.append(" }"sv);
+
+    return builder.to_string();
+}
+
+// A symbolic reference to a method of a class is derived from a CONSTANT_Fieldref_info structure
+// Very similar to a SymbolicatedMethodReference
+SymbolicatedFieldReference::SymbolicatedFieldReference(u16 index, String name, String descriptor, NonnullRefPtr<SymbolicatedClassReference> owner)
+    : SymbolicatedReference(index, SymbolicatedReference::Type::Field)
+    , m_name(move(name))
+    , m_descriptor(move(descriptor))
+    , m_owner(owner)
+{
+}
+
+// Attempts to symbolicate a class reference, given its index into the parsed constant pool
+ErrorOr<NonnullRefPtr<SymbolicatedFieldReference>> SymbolicatedFieldReference::create(u16 index, SymbolicatedConstantPool* symbolicated_pool)
+{
+    // The entry at the index must be a Constant_Methodref_info structure.
+    auto const& method_info = TRY(symbolicated_pool->parsed_pool()->field_reference_at(index));
 
     // The entry at `name_and_type_index` must be a CONSTANT_NameAndType_info structure.
     auto const& name_and_type = TRY(symbolicated_pool->parsed_pool()->name_and_type_at(method_info->name_and_type_index()));
@@ -88,15 +137,15 @@ ErrorOr<NonnullRefPtr<SymbolicatedMethodReference>> SymbolicatedMethodReference:
     // The value of the `class_index` type must correspond to a SymbolicatedClassReference.
     auto owner = TRY(symbolicated_pool->get_or_symbolicate_class(method_info->class_index()));
 
-    return try_make_ref_counted<SymbolicatedMethodReference>(index, name, descriptor, owner);
+    return try_make_ref_counted<SymbolicatedFieldReference>(index, name, descriptor, owner);
 }
 
 // Used for debugging
-ErrorOr<String> SymbolicatedMethodReference::debug_description()
+ErrorOr<String> SymbolicatedFieldReference::debug_description()
 {
     StringBuilder builder;
 
-    builder.append("SymbolicatedMethodReference { "sv);
+    builder.append("SymbolicatedFieldReference { "sv);
     builder.appendff("name = \"{}\", ", this->name());
     builder.appendff("descriptor = \"{}\", ", this->descriptor());
     builder.appendff("owner = {}", TRY(this->owner()->debug_description()));

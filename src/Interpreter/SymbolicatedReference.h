@@ -30,7 +30,10 @@ public:
         Class,
 
         // A symbolic reference to a method of a class is derived from a CONSTANT_Methodref_info structure
-        Method
+        Method,
+
+        // A symbolic reference to a method of a class is derived from a CONSTANT_Fieldref_info structure
+        Field
     };
 
     SymbolicatedReference(u16 index, Type type);
@@ -76,6 +79,32 @@ public:
 
     // Attempts to symbolicate a method reference, given its index into the parsed constant pool
     static ErrorOr<NonnullRefPtr<SymbolicatedMethodReference>> create(u16 index, SymbolicatedConstantPool* symbolicated_pool);
+
+    // Used for debugging
+    ErrorOr<String> debug_description();
+
+    // The unqualified name of this method
+    String const& name() { return m_name; };
+
+    // The descriptor (signature) of this method
+    String const& descriptor() { return m_descriptor; };
+
+    NonnullRefPtr<SymbolicatedClassReference> const& owner() { return m_owner; };
+
+private:
+    String m_name;
+    String m_descriptor;
+    NonnullRefPtr<SymbolicatedClassReference> m_owner;
+};
+
+// A symbolic reference to a method of a class is derived from a CONSTANT_Fieldref_info structure
+// Very similar to a SymbolicatedMethodReference
+class SymbolicatedFieldReference : public SymbolicatedReference {
+public:
+    SymbolicatedFieldReference(u16 index, String name, String descriptor, NonnullRefPtr<SymbolicatedClassReference> owner);
+
+    // Attempts to symbolicate a method reference, given its index into the parsed constant pool
+    static ErrorOr<NonnullRefPtr<SymbolicatedFieldReference>> create(u16 index, SymbolicatedConstantPool* symbolicated_pool);
 
     // Used for debugging
     ErrorOr<String> debug_description();

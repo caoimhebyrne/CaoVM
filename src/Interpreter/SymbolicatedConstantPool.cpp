@@ -54,6 +54,13 @@ ErrorOr<void> SymbolicatedConstantPool::symbolicate()
             break;
         }
 
+        case Constant::Tag::FieldReference: {
+            auto reference = TRY(SymbolicatedFieldReference::create(index, this));
+            entries().set(index, reference);
+
+            break;
+        }
+
         // Only used indirectly when constructing the run-time constant pool.
         // No entries in the run-time constant pool correspond directly to these structures.
         case Constant::Tag::UTF8:
@@ -71,7 +78,7 @@ ErrorOr<void> SymbolicatedConstantPool::symbolicate()
     }
 
     // FIXME: Remove this, only used for debugging
-    dbgln("Symbolicated {} constant pool entries out of {}!", entries().size(), constant_entries.size());
+    dbgln("Symbolicated {} constant pool entries:", entries().size());
     for (auto entry : entries()) {
         dbgln("  - {}: {}", entry.key, TRY(entry.value->debug_description()));
     }
