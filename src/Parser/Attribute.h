@@ -67,7 +67,7 @@ class CodeAttribute : public Attribute {
 public:
     CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vector<NonnullRefPtr<Attribute>> attributes);
 
-    static ErrorOr<NonnullRefPtr<CodeAttribute>> parse(ClassParser& class_parser, NonnullOwnPtr<ConstantPool> const& constant_pool);
+    static ErrorOr<NonnullRefPtr<CodeAttribute>> parse(ClassParser& class_parser, NonnullRefPtr<ConstantPool> const& constant_pool);
 
     ErrorOr<String> debug_description();
 

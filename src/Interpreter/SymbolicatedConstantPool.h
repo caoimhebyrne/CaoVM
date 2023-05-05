@@ -20,14 +20,14 @@ namespace Interpreter {
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html#jvms-5.1
 class SymbolicatedConstantPool : public RefCounted<SymbolicatedConstantPool> {
 public:
-    SymbolicatedConstantPool(NonnullOwnPtr<Parser::ConstantPool> parsed_pool);
-    static NonnullRefPtr<SymbolicatedConstantPool> create(NonnullOwnPtr<Parser::ConstantPool> parsed_pool);
+    SymbolicatedConstantPool(NonnullRefPtr<Parser::ConstantPool> parsed_pool);
+    static NonnullRefPtr<SymbolicatedConstantPool> create(NonnullRefPtr<Parser::ConstantPool> parsed_pool);
 
     // Iterates through the entries found in the constant pool and symbolicates them
     ErrorOr<void> symbolicate();
 
     // Returns a reference to the non-symbolicated constant pool
-    NonnullOwnPtr<Parser::ConstantPool>& parsed_pool() { return m_parsed_pool; };
+    NonnullRefPtr<Parser::ConstantPool> parsed_pool() { return m_parsed_pool; };
 
     HashMap<u16, NonnullRefPtr<SymbolicatedReference>>& entries() { return m_entries; };
 
@@ -36,7 +36,7 @@ public:
 
 private:
     // The non-symbolicated constant pool
-    NonnullOwnPtr<Parser::ConstantPool> m_parsed_pool;
+    NonnullRefPtr<Parser::ConstantPool> m_parsed_pool;
 
     HashMap<u16, NonnullRefPtr<SymbolicatedReference>> m_entries;
 };

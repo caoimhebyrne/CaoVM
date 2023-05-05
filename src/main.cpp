@@ -42,7 +42,7 @@ ErrorOr<int> serenity_main(Main::Arguments arguments)
 
     // Attempt to symbolicate the parsed constant pool
     // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-5.html#jvms-5.1
-    auto symbolicated_constant_pool = Interpreter::SymbolicatedConstantPool::create(move(class_file.constant_pool));
+    auto symbolicated_constant_pool = Interpreter::SymbolicatedConstantPool::create(class_file.constant_pool);
     TRY(symbolicated_constant_pool->symbolicate());
 
     return 0;

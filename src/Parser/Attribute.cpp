@@ -46,7 +46,7 @@ CodeAttribute::CodeAttribute(u16 max_stack, u16 max_locals, ByteBuffer code, Vec
 {
 }
 
-ErrorOr<NonnullRefPtr<CodeAttribute>> CodeAttribute::parse(ClassParser& class_parser, NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullRefPtr<CodeAttribute>> CodeAttribute::parse(ClassParser& class_parser, NonnullRefPtr<ConstantPool> const& constant_pool)
 {
     auto max_stack = TRY(class_parser.read_u2());
     auto max_locals = TRY(class_parser.read_u2());

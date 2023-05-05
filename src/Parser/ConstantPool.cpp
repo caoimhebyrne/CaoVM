@@ -12,7 +12,7 @@
 
 namespace Parser {
 
-ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& class_parser)
+ErrorOr<NonnullRefPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& class_parser)
 {
     auto entries = Vector<NonnullRefPtr<ConstantInfo>>();
 
@@ -64,7 +64,7 @@ ErrorOr<NonnullOwnPtr<ConstantPool>> ConstantPool::parse(u16 size, ClassParser& 
         }
     }
 
-    return make<ConstantPool>(move(entries));
+    return try_make_ref_counted<ConstantPool>(move(entries));
 }
 
 // Attempts to read a method reference from the constant pool

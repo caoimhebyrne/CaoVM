@@ -99,7 +99,7 @@ ErrorOr<ClassFile> ClassParser::parse()
         .minor_version = minor_version,
         .major_version = major_version,
         .constant_pool_count = constant_pool_count,
-        .constant_pool = move(constant_pool),
+        .constant_pool = constant_pool,
         .access_flags = access_flags,
         .this_class = this_class,
         .super_class = super_class,
@@ -112,7 +112,7 @@ ErrorOr<ClassFile> ClassParser::parse()
     return file;
 }
 
-ErrorOr<NonnullRefPtr<ConstantClassInfo>> ClassParser::parse_interface(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullRefPtr<ConstantClassInfo>> ClassParser::parse_interface(NonnullRefPtr<ConstantPool> const& constant_pool)
 {
     // Each value in ther interfaces array is an index into the constant pool table
     auto index = TRY(this->read_u2());
@@ -126,7 +126,7 @@ ErrorOr<NonnullRefPtr<ConstantClassInfo>> ClassParser::parse_interface(NonnullOw
     return adopt_ref(casted_reference);
 }
 
-ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullRefPtr<ConstantPool> const& constant_pool)
 {
     // Used to denote access permission to this field
     auto access_flags = TRY(this->read_u2());
@@ -148,7 +148,7 @@ ErrorOr<NonnullOwnPtr<FieldInfo>> ClassParser::parse_field(NonnullOwnPtr<Constan
     return try_make<FieldInfo>(access_flags, name_index, descriptor_index, move(attributes));
 }
 
-ErrorOr<NonnullOwnPtr<MethodInfo>> ClassParser::parse_method(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullOwnPtr<MethodInfo>> ClassParser::parse_method(NonnullRefPtr<ConstantPool> const& constant_pool)
 {
     // Used to denote access permission to this field
     auto access_flags = TRY(this->read_u2());
@@ -170,7 +170,7 @@ ErrorOr<NonnullOwnPtr<MethodInfo>> ClassParser::parse_method(NonnullOwnPtr<Const
     return try_make<MethodInfo>(access_flags, name_index, descriptor_index, move(attributes));
 }
 
-ErrorOr<NonnullRefPtr<Attribute>> ClassParser::parse_attribute(NonnullOwnPtr<ConstantPool> const& constant_pool)
+ErrorOr<NonnullRefPtr<Attribute>> ClassParser::parse_attribute(NonnullRefPtr<ConstantPool> const& constant_pool)
 {
     // An index in the constant pool table to name of this attribute
     auto name_index = TRY(this->read_u2());

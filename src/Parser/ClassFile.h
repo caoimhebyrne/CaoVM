@@ -80,7 +80,7 @@ struct ClassFile {
 
     // The value of the constant_pool_count item is equal to the number of entries in the constant_pool table plus one.
     u16 constant_pool_count;
-    NonnullOwnPtr<ConstantPool> constant_pool;
+    NonnullRefPtr<ConstantPool> constant_pool;
 
     // A mask of flags used to denote access permissions to and properties of this class or interface
     u16 access_flags;

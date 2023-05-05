@@ -24,14 +24,14 @@ class ConstantClassInfo;
 class ConstantFieldReferenceInfo;
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
-class ConstantPool {
+class ConstantPool : public RefCounted<ConstantPool> {
 public:
     ConstantPool(Vector<NonnullRefPtr<ConstantInfo>> entries)
         : m_entries(move(entries))
     {
     }
 
-    static ErrorOr<NonnullOwnPtr<ConstantPool>> parse(u16 size, ClassParser& class_parser);
+    static ErrorOr<NonnullRefPtr<ConstantPool>> parse(u16 size, ClassParser& class_parser);
 
     Vector<NonnullRefPtr<ConstantInfo>> const& entries() { return m_entries; };
 

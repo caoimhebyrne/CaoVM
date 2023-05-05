@@ -10,15 +10,15 @@
 
 namespace Interpreter {
 
-SymbolicatedConstantPool::SymbolicatedConstantPool(NonnullOwnPtr<Parser::ConstantPool> parsed_pool)
+SymbolicatedConstantPool::SymbolicatedConstantPool(NonnullRefPtr<Parser::ConstantPool> parsed_pool)
     : m_parsed_pool(move(parsed_pool))
 {
 }
 
-NonnullRefPtr<SymbolicatedConstantPool> SymbolicatedConstantPool::create(NonnullOwnPtr<Parser::ConstantPool> parsed_pool)
+NonnullRefPtr<SymbolicatedConstantPool> SymbolicatedConstantPool::create(NonnullRefPtr<Parser::ConstantPool> parsed_pool)
 {
     // FIXME: Verify some stuff about the constant pool before continuing
-    return make_ref_counted<SymbolicatedConstantPool>(move(parsed_pool));
+    return make_ref_counted<SymbolicatedConstantPool>(parsed_pool);
 }
 
 // Iterates through the entries found in the constant pool and symbolicates them
