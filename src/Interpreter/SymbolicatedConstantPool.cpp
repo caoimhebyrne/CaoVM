@@ -54,6 +54,13 @@ ErrorOr<void> SymbolicatedConstantPool::symbolicate()
             break;
         }
 
+        // Only used indirectly when constructing the run-time constant pool.
+        // No entries in the run-time constant pool correspond directly to these structures.
+        case Constant::Tag::UTF8:
+        case Constant::Tag::NameAndType: {
+            break;
+        }
+
         default: {
             // FIXME: We need to use proper error types
             warnln("!!! No symbolicator for {} at {}\n", TRY(entry->debug_description()), index);
