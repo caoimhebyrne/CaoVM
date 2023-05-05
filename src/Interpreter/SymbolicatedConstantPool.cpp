@@ -71,7 +71,6 @@ ErrorOr<void> SymbolicatedConstantPool::symbolicate()
         default: {
             // FIXME: We need to use proper error types
             warnln("!!! No symbolicator for {} at {}\n", TRY(entry->debug_description()), index);
-            TODO();
             break;
         }
         }
