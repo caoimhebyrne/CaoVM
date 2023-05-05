@@ -43,7 +43,17 @@ ErrorOr<void> SymbolicatedConstantPool::symbolicate()
         case Constant::Tag::Class: {
             auto reference = TRY(SymbolicatedClassReference::create(index, this));
             entries().set(index, reference);
+
+            break;
         }
+
+        case Constant::Tag::MethodReference: {
+            auto reference = TRY(SymbolicatedMethodReference::create(index, this));
+            entries().set(index, reference);
+
+            break;
+        }
+
         default: {
             // FIXME: We need to use proper error types
             warnln("!!! No symbolicator for {} at {}\n", TRY(entry->debug_description()), index);

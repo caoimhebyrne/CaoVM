@@ -27,7 +27,10 @@ class SymbolicatedReference : public RefCounted<SymbolicatedReference> {
 public:
     enum Type {
         // A symbolic reference to a class or interface is derived from a CONSTANT_Class_info structure
-        Class
+        Class,
+
+        // A symbolic reference to a method of a class is derived from a CONSTANT_Methodref_info structure
+        Method
     };
 
     SymbolicatedReference(u16 index, Type type);
@@ -64,6 +67,31 @@ public:
 
 private:
     String m_name;
+};
+
+// A symbolic reference to a method of a class is derived from a CONSTANT_Methodref_info structure
+class SymbolicatedMethodReference : public SymbolicatedReference {
+public:
+    SymbolicatedMethodReference(u16 index, String name, String descriptor, NonnullRefPtr<SymbolicatedClassReference> owner);
+
+    // Attempts to symbolicate a method reference, given its index into the parsed constant pool
+    static ErrorOr<NonnullRefPtr<SymbolicatedMethodReference>> create(u16 index, SymbolicatedConstantPool* symbolicated_pool);
+
+    // Used for debugging
+    ErrorOr<String> debug_description();
+
+    // The unqualified name of this method
+    String const& name() { return m_name; };
+
+    // The descriptor (signature) of this method
+    String const& descriptor() { return m_descriptor; };
+
+    NonnullRefPtr<SymbolicatedClassReference> const& owner() { return m_owner; };
+
+private:
+    String m_name;
+    String m_descriptor;
+    NonnullRefPtr<SymbolicatedClassReference> m_owner;
 };
 
 }
