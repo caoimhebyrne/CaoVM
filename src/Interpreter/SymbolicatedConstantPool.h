@@ -31,6 +31,9 @@ public:
 
     HashMap<u16, NonnullRefPtr<SymbolicatedReference>>& entries() { return m_entries; };
 
+    // Attempts to retreive a symbolicated class reference, or creates if it hasn't been symbolicated yet
+    ErrorOr<NonnullRefPtr<SymbolicatedClassReference>> get_or_symbolicate_class(u16 index);
+
 private:
     // The non-symbolicated constant pool
     NonnullOwnPtr<Parser::ConstantPool> m_parsed_pool;

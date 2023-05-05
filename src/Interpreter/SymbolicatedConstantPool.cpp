@@ -62,4 +62,26 @@ ErrorOr<void> SymbolicatedConstantPool::symbolicate()
     return {};
 }
 
+ErrorOr<NonnullRefPtr<SymbolicatedClassReference>> SymbolicatedConstantPool::get_or_symbolicate_class(u16 index)
+{
+    // Attempt to get the existing symbolicated class reference
+    auto optional_reference = entries().get(index);
+    if (optional_reference.has_value()) {
+        auto reference = optional_reference.value();
+
+        // We need to verify that we have the correct type
+        VERIFY(reference->type() == SymbolicatedReference::Type::Class);
+
+        // All we need to do now is cast it to the expected type :)
+        auto& casted_reference = static_cast<SymbolicatedClassReference&>(*reference);
+        return adopt_ref(casted_reference);
+    }
+
+    // We don't have a reference already, so let's create one.
+    auto reference = TRY(SymbolicatedClassReference::create(index, this));
+    entries().set(index, reference);
+
+    return reference;
+}
+
 }
