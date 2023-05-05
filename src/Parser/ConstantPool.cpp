@@ -79,6 +79,18 @@ ErrorOr<NonnullRefPtr<ConstantMethodReferenceInfo>> ConstantPool::method_referen
     return static_cast<Parser::ConstantMethodReferenceInfo&>(*entry);
 }
 
+// Attempts to read a field reference from the constant pool
+ErrorOr<NonnullRefPtr<ConstantFieldReferenceInfo>> ConstantPool::field_reference_at(u16 index)
+{
+    // The value of the `index` item must be a valid index into the constant_pool table.
+    auto const& entry = entries().at(index - 1);
+
+    // The constant_pool entry at that index must be a CONSTANT_Fieldref_info structure.
+    VERIFY(entry->tag() == Constant::Tag::FieldReference);
+
+    return static_cast<Parser::ConstantFieldReferenceInfo&>(*entry);
+}
+
 // Attempts to read a method reference from the constant pool
 ErrorOr<NonnullRefPtr<ConstantNameAndTypeInfo>> ConstantPool::name_and_type_at(u16 index)
 {

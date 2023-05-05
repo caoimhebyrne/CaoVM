@@ -21,6 +21,7 @@ class ConstantMethodReferenceInfo;
 class ConstantNameAndTypeInfo;
 class ConstantUTF8Info;
 class ConstantClassInfo;
+class ConstantFieldReferenceInfo;
 
 // https://docs.oracle.com/javase/specs/jvms/se17/html/jvms-4.html#jvms-4.4
 class ConstantPool {
@@ -36,6 +37,9 @@ public:
 
     // Attempts to read a method reference from the constant pool
     ErrorOr<NonnullRefPtr<ConstantMethodReferenceInfo>> method_reference_at(u16 index);
+
+    // Attempts to read a field reference from the constant pool
+    ErrorOr<NonnullRefPtr<ConstantFieldReferenceInfo>> field_reference_at(u16 index);
 
     // Attempts to read a name and type from the constant pool
     ErrorOr<NonnullRefPtr<ConstantNameAndTypeInfo>> name_and_type_at(u16 index);
